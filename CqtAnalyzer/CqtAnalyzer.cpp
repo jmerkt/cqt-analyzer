@@ -26,12 +26,16 @@ CqtAnalyzer::CqtAnalyzer(const InstanceInfo& info)
 #if IPLUG_DSP
 void CqtAnalyzer::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 {
-  const double gain = GetParam(kGain)->Value() / 100.;
   const int nChans = NOutChansConnected();
-  
+ 
+  // Analyze data
+
+  // Pass spectra to gui
+
+  // Bypass audio
   for (int s = 0; s < nFrames; s++) {
     for (int c = 0; c < nChans; c++) {
-      outputs[c][s] = inputs[c][s] * gain;
+      outputs[c][s] = inputs[c][s];
     }
   }
 }

@@ -153,7 +153,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>$(VST3_DEFS);$(DEBUG_DEFS);$(EXTRA_DEBUG_DEFS);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(VST3_INC_PATHS);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\VST_Plugins\git\cqt-analyzer\submodules\VST3_SDK;$(VST3_INC_PATHS);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -168,7 +168,7 @@
       <Optimization>Disabled</Optimization>
       <PreprocessorDefinitions>$(VST3_DEFS);$(DEBUG_DEFS);$(EXTRA_DEBUG_DEFS);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
-      <AdditionalIncludeDirectories>$(VST3_INC_PATHS);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\VST_Plugins\git\cqt-analyzer\submodules\VST3_SDK;$(VST3_INC_PATHS);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -185,7 +185,7 @@
       <PreprocessorDefinitions>$(VST3_DEFS);$(RELEASE_DEFS);$(EXTRA_RELEASE_DEFS);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>$(VST3_INC_PATHS);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\VST_Plugins\git\cqt-analyzer\submodules\VST3_SDK;$(VST3_INC_PATHS);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -205,7 +205,7 @@
       <PreprocessorDefinitions>$(VST3_DEFS);$(RELEASE_DEFS);$(EXTRA_RELEASE_DEFS);%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <MultiProcessorCompilation>true</MultiProcessorCompilation>
       <FavorSizeOrSpeed>Speed</FavorSizeOrSpeed>
-      <AdditionalIncludeDirectories>$(VST3_INC_PATHS);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>D:\VST_Plugins\git\cqt-analyzer\submodules\VST3_SDK;$(VST3_INC_PATHS);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
@@ -254,30 +254,30 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="../config.h" />
-    <ClInclude Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\classfactoryhelpers.h" />
-    <ClInclude Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\fbuffer.h" />
-    <ClInclude Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\fcleanup.h" />
-    <ClInclude Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\fcommandline.h" />
-    <ClInclude Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\fdebug.h" />
-    <ClInclude Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\fdynlib.h" />
-    <ClInclude Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\fobject.h" />
-    <ClInclude Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\fstdmethods.h" />
-    <ClInclude Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\fstreamer.h" />
-    <ClInclude Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\fstring.h" />
-    <ClInclude Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\hexbinary.h" />
-    <ClInclude Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\timer.h" />
-    <ClInclude Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\updatehandler.h" />
-    <ClInclude Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\pluginterfaces\base\conststringtable.h" />
-    <ClInclude Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\pluginterfaces\base\funknown.h" />
-    <ClInclude Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\pluginterfaces\base\ustring.h" />
-    <ClInclude Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\public.sdk\source\common\memorystream.h" />
-    <ClInclude Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\public.sdk\source\common\pluginview.h" />
-    <ClInclude Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\public.sdk\source\vst\vstaudioeffect.h" />
-    <ClInclude Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\public.sdk\source\vst\vstbus.h" />
-    <ClInclude Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\public.sdk\source\vst\vstcomponent.h" />
-    <ClInclude Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\public.sdk\source\vst\vstcomponentbase.h" />
-    <ClInclude Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\public.sdk\source\vst\vstparameters.h" />
-    <ClInclude Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\public.sdk\source\vst\vstsinglecomponenteffect.h" />
+    <ClInclude Include="..\..\submodules\iPlug2\VST3_SDK\base\source\classfactoryhelpers.h" />
+    <ClInclude Include="..\..\submodules\VST3_SDK\base\source\fbuffer.h" />
+    <ClInclude Include="..\..\submodules\VST3_SDK\base\source\fcleanup.h" />
+    <ClInclude Include="..\..\submodulesVST3_SDK\base\source\fcommandline.h" />
+    <ClInclude Include="..\..\submodules\VST3_SDK\base\source\fdebug.h" />
+    <ClInclude Include="..\..\submodules\VST3_SDK\base\source\fdynlib.h" />
+    <ClInclude Include="..\..\submodules\VST3_SDK\base\source\fobject.h" />
+    <ClInclude Include="..\..\submodules\VST3_SDK\base\source\fstdmethods.h" />
+    <ClInclude Include="..\..\submodules\VST3_SDK\base\source\fstreamer.h" />
+    <ClInclude Include="..\..\submodules\VST3_SDK\base\source\fstring.h" />
+    <ClInclude Include="..\..\submodules\VST3_SDK\base\source\hexbinary.h" />
+    <ClInclude Include="..\..\submodules\VST3_SDK\base\source\timer.h" />
+    <ClInclude Include="..\..\submodules\VST3_SDK\base\source\updatehandler.h" />
+    <ClInclude Include="..\..\submodules\VST3_SDK\pluginterfaces\base\conststringtable.h" />
+    <ClInclude Include="..\..\submodules\VST3_SDK\pluginterfaces\base\funknown.h" />
+    <ClInclude Include="..\..\submodules\VST3_SDK\pluginterfaces\base\ustring.h" />
+    <ClInclude Include="..\..\submodules\VST3_SDK\public.sdk\source\common\memorystream.h" />
+    <ClInclude Include="..\..\submodules\VST3_SDK\public.sdk\source\common\pluginview.h" />
+    <ClInclude Include="..\..\submodules\VST3_SDK\public.sdk\source\vst\vstaudioeffect.h" />
+    <ClInclude Include="..\..\submodules\VST3_SDK\public.sdk\source\vst\vstbus.h" />
+    <ClInclude Include="..\..\submodules\VST3_SDK\public.sdk\source\vst\vstcomponent.h" />
+    <ClInclude Include="..\..\submodules\VST3_SDK\public.sdk\source\vst\vstcomponentbase.h" />
+    <ClInclude Include="..\..\submodules\VST3_SDK\public.sdk\source\vst\vstparameters.h" />
+    <ClInclude Include="..\..\submodules\VST3_SDK\public.sdk\source\vst\vstsinglecomponenteffect.h" />
     <ClInclude Include="..\..\submodules\iPlug2\IGraphics\Controls\IControls.h" />
     <ClInclude Include="..\..\submodules\iPlug2\IGraphics\Controls\IPopupMenuControl.h" />
     <ClInclude Include="..\..\submodules\iPlug2\IGraphics\Controls\ITextEntryControl.h" />
@@ -330,33 +330,36 @@
     <ClInclude Include="..\resources\resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\baseiids.cpp" />
-    <ClCompile Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\fbuffer.cpp" />
-    <ClCompile Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\fdebug.cpp" />
-    <ClCompile Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\fdynlib.cpp" />
-    <ClCompile Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\fobject.cpp" />
-    <ClCompile Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\fstreamer.cpp" />
-    <ClCompile Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\fstring.cpp" />
-    <ClCompile Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\timer.cpp" />
-    <ClCompile Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\base\source\updatehandler.cpp" />
-    <ClCompile Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\base\thread\source\fcondition.cpp" />
-    <ClCompile Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\base\thread\source\flock.cpp" />
-    <ClCompile Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\pluginterfaces\base\conststringtable.cpp" />
-    <ClCompile Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\pluginterfaces\base\coreiids.cpp" />
-    <ClCompile Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\pluginterfaces\base\funknown.cpp" />
-    <ClCompile Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\pluginterfaces\base\ustring.cpp" />
-    <ClCompile Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\public.sdk\source\common\memorystream.cpp" />
-    <ClCompile Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\public.sdk\source\common\pluginview.cpp" />
-    <ClCompile Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\public.sdk\source\common\commoniids.cpp" />
-    <ClCompile Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\public.sdk\source\main\dllmain.cpp" />
-    <ClCompile Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\public.sdk\source\main\pluginfactory.cpp" />
-    <ClCompile Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\public.sdk\source\vst\vstaudioeffect.cpp" />
-    <ClCompile Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\public.sdk\source\vst\vstbus.cpp" />
-    <ClCompile Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\public.sdk\source\vst\vstcomponent.cpp" />
-    <ClCompile Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\public.sdk\source\vst\vstcomponentbase.cpp" />
-    <ClCompile Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\public.sdk\source\vst\vstinitiids.cpp" />
-    <ClCompile Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\public.sdk\source\vst\vstparameters.cpp" />
-    <ClCompile Include="..\..\submodules\iPlug2\Dependencies\IPlug\VST3_SDK\public.sdk\source\vst\vstsinglecomponenteffect.cpp" />
+    <ClCompile Include="..\..\..\..\lib\FFT\pffft-master\pffft.c" />
+    <ClCompile Include="..\..\..\..\lib\FFT\pffft-master\pffft_common.c" />
+    <ClCompile Include="..\..\..\..\lib\FFT\pffft-master\pffft_double.c" />
+    <ClCompile Include="..\..\submodules\VST3_SDK\base\source\baseiids.cpp" />
+    <ClCompile Include="..\..\submodules\VST3_SDK\base\source\fbuffer.cpp" />
+    <ClCompile Include="..\..\submodules\VST3_SDK\base\source\fdebug.cpp" />
+    <ClCompile Include="..\..\submodules\VST3_SDK\base\source\fdynlib.cpp" />
+    <ClCompile Include="..\..\submodules\VST3_SDK\base\source\fobject.cpp" />
+    <ClCompile Include="..\..\submodules\VST3_SDK\base\source\fstreamer.cpp" />
+    <ClCompile Include="..\..\submodules\VST3_SDK\base\source\fstring.cpp" />
+    <ClCompile Include="..\..\submodules\VST3_SDK\base\source\timer.cpp" />
+    <ClCompile Include="..\..\submodules\VST3_SDK\base\source\updatehandler.cpp" />
+    <ClCompile Include="..\..\submodules\VST3_SDK\base\thread\source\fcondition.cpp" />
+    <ClCompile Include="..\..\submodules\VST3_SDK\base\thread\source\flock.cpp" />
+    <ClCompile Include="..\..\submodules\VST3_SDK\pluginterfaces\base\conststringtable.cpp" />
+    <ClCompile Include="..\..\submodules\VST3_SDK\pluginterfaces\base\coreiids.cpp" />
+    <ClCompile Include="..\..\submodules\VST3_SDK\pluginterfaces\base\funknown.cpp" />
+    <ClCompile Include="..\..\submodules\VST3_SDK\pluginterfaces\base\ustring.cpp" />
+    <ClCompile Include="..\..\submodules\VST3_SDK\public.sdk\source\common\memorystream.cpp" />
+    <ClCompile Include="..\..\submodules\VST3_SDK\public.sdk\source\common\pluginview.cpp" />
+    <ClCompile Include="..\..\submodules\VST3_SDK\public.sdk\source\common\commoniids.cpp" />
+    <ClCompile Include="..\..\submodules\VST3_SDK\public.sdk\source\main\dllmain.cpp" />
+    <ClCompile Include="..\..\submodules\VST3_SDK\public.sdk\source\main\pluginfactory.cpp" />
+    <ClCompile Include="..\..\submodules\VST3_SDK\public.sdk\source\vst\vstaudioeffect.cpp" />
+    <ClCompile Include="..\..\submodules\VST3_SDK\public.sdk\source\vst\vstbus.cpp" />
+    <ClCompile Include="..\..\submodules\VST3_SDK\public.sdk\source\vst\vstcomponent.cpp" />
+    <ClCompile Include="..\..\submodules\VST3_SDK\public.sdk\source\vst\vstcomponentbase.cpp" />
+    <ClCompile Include="..\..\submodules\VST3_SDK\public.sdk\source\vst\vstinitiids.cpp" />
+    <ClCompile Include="..\..\submodules\VST3_SDK\public.sdk\source\vst\vstparameters.cpp" />
+    <ClCompile Include="..\..\submodules\VST3_SDK\public.sdk\source\vst\vstsinglecomponenteffect.cpp" />
     <ClCompile Include="..\..\submodules\iPlug2\IGraphics\Controls\IControls.cpp" />
     <ClCompile Include="..\..\submodules\iPlug2\IGraphics\Controls\IPopupMenuControl.cpp" />
     <ClCompile Include="..\..\submodules\iPlug2\IGraphics\Controls\ITextEntryControl.cpp" />

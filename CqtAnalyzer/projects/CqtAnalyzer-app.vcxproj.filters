@@ -77,6 +77,15 @@
     <ClCompile Include="..\..\submodules\iPlug2\IGraphics\Drawing\IGraphicsSkia.cpp">
       <Filter>IGraphics\Drawing</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\lib\FFT\pffft-master\pffft.c">
+      <Filter>FFT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\lib\FFT\pffft-master\pffft_common.c">
+      <Filter>FFT</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\..\lib\FFT\pffft-master\pffft_double.c">
+      <Filter>FFT</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\CqtAnalyzer.h" />
@@ -289,6 +298,9 @@
     </Filter>
     <Filter Include="IPlug\APP\RTAudioMidi\include">
       <UniqueIdentifier>{649c5de3-b4c2-4de9-8d57-3b1762646259}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="FFT">
+      <UniqueIdentifier>{a8bbbd5d-d5c2-4573-bed1-f00775dc6e94}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

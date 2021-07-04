@@ -1,6 +1,10 @@
 #pragma once
 
 #include "IPlug_include_in_plug_hdr.h"
+#include "../../../lib/FFTDomain/ConstantQTransform.h"
+
+constexpr int BinsPerOctave{ 12 };
+constexpr int OctaveNumber{ 8 };
 
 const int kNumPresets = 1;
 
@@ -20,5 +24,9 @@ public:
 
 #if IPLUG_DSP // http://bit.ly/2S64BDd
   void ProcessBlock(sample** inputs, sample** outputs, int nFrames) override;
+
+  Cqt::ConstantQTransform<BinsPerOctave, OctaveNumber> mCqt;
+
+  WDL_Mutex mMutex;
 #endif
 };
