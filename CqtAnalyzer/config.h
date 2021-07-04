@@ -2,11 +2,11 @@
 #define PLUG_MFR "ChromaDSP"
 #define PLUG_VERSION_HEX 0x00010000
 #define PLUG_VERSION_STR "1.0.0"
-#define PLUG_UNIQUE_ID 'FL7w'
-#define PLUG_MFR_ID 'Acme'
-#define PLUG_URL_STR "https://iplug2.github.io"
-#define PLUG_EMAIL_STR "spam@me.com"
-#define PLUG_COPYRIGHT_STR "Copyright 2020 Acme Inc"
+#define PLUG_UNIQUE_ID 'ctAn'
+#define PLUG_MFR_ID 'chrD'
+#define PLUG_URL_STR "https://ChromaDSP.com"
+#define PLUG_EMAIL_STR "contact@chromadsp.com"
+#define PLUG_COPYRIGHT_STR "ChromaDSP"
 #define PLUG_CLASS_NAME CqtAnalyzer
 
 #define BUNDLE_NAME "CqtAnalyzer"

@@ -366,6 +366,12 @@
     <ClInclude Include="..\..\submodules\iPlug2\IGraphics\ISender.h">
       <Filter>IGraphics</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\..\..\lib\FFTDomain\ConstantQTransform.h">
+      <Filter>Cqt</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gui\CqtVisual.h">
+      <Filter>gui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="resources">
@@ -427,6 +433,12 @@
     </Filter>
     <Filter Include="FFT">
       <UniqueIdentifier>{036f7280-ed04-49ed-a904-bb0971af8b4a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Cqt">
+      <UniqueIdentifier>{80d1a567-d0c2-477f-9260-e36669a227ea}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="gui">
+      <UniqueIdentifier>{da45a5ba-f415-4917-a8a4-d62b450221d6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
