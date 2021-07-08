@@ -255,7 +255,10 @@
   <ItemGroup>
     <ClInclude Include="../config.h" />
     <ClInclude Include="..\..\..\..\lib\FFTDomain\ConstantQTransform.h" />
+    <ClInclude Include="..\..\include\gui\ChromaVisual.h" />
     <ClInclude Include="..\..\include\gui\CqtVisual.h" />
+    <ClInclude Include="..\..\include\gui\OctaveEnvelopeVisual.h" />
+    <ClInclude Include="..\..\include\TimerMt.h" />
     <ClInclude Include="..\..\submodules\iPlug2\VST3_SDK\base\source\classfactoryhelpers.h" />
     <ClInclude Include="..\..\submodules\VST3_SDK\base\source\fbuffer.h" />
     <ClInclude Include="..\..\submodules\VST3_SDK\base\source\fcleanup.h" />

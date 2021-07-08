@@ -372,6 +372,15 @@
     <ClInclude Include="..\..\include\gui\CqtVisual.h">
       <Filter>gui</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\include\TimerMt.h">
+      <Filter>helpers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gui\ChromaVisual.h">
+      <Filter>gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\include\gui\OctaveEnvelopeVisual.h">
+      <Filter>gui</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="resources">
@@ -439,6 +448,9 @@
     </Filter>
     <Filter Include="gui">
       <UniqueIdentifier>{da45a5ba-f415-4917-a8a4-d62b450221d6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="helpers">
+      <UniqueIdentifier>{b33994a9-94e2-4aae-8bc7-b2e485dc27ba}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>

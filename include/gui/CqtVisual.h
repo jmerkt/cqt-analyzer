@@ -27,7 +27,7 @@ class CqtBar : public IControl
 			if (value < 0.) {
 				value = 0.;
 			}
-			mValue = value;
+			mValue = value * 0.25 + mValue * 0.75;
 		};
 		double getValue() {
 			return mValue;
