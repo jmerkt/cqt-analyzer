@@ -1,11 +1,18 @@
 #include "CqtAnalyzer.h"
 #include "IPlug_include_in_plug_src.h"
 #include "IControls.h"
-#include "../../include/gui/CqtVisual.h"
+#include "../../include/gui/ICqtMagnitudes.h"
+#include "../../include/gui/IChromaFeature.h"
+#include "../../include/gui/IOctaveMagnitudes.h"
 
 CqtAnalyzer::CqtAnalyzer(const InstanceInfo& info)
 : Plugin(info, MakeConfig(kNumParams, kNumPresets))
 {
+  // controls
+  GetParam(kTuning)->InitDouble("Tuning", 440., 415., 465.0, 0.01, "Hz");
+  GetParam(kChannel)->InitInt("Channel", 0, 0, 1, "");
+  GetParam(kMagMin)->InitDouble("MagMin", -100., -120., 20., 5., "dB");
+  GetParam(kMagMax)->InitDouble("MagMax", 0., -120., 20., 5., "dB");
 
 #if IPLUG_EDITOR // http://bit.ly/2S64BDd
   mMakeGraphicsFunc = [&]() 
@@ -15,12 +22,61 @@ CqtAnalyzer::CqtAnalyzer(const InstanceInfo& info)
   
   mLayoutFunc = [&](IGraphics* pGraphics) 
   {
+    const IVStyle style
+    {
+        true, // Show label
+        true, // Show value
+    {
+    DEFAULT_BGCOLOR, // Background
+    DEFAULT_FGCOLOR, // Foreground
+    DEFAULT_PRCOLOR, // Pressed
+    COLOR_BLACK, // Frame
+    DEFAULT_HLCOLOR, // Highlight
+    DEFAULT_SHCOLOR, // Shadow
+    COLOR_BLACK, // Extra 1
+    DEFAULT_X2COLOR, // Extra 2
+    DEFAULT_X3COLOR  // Extra 3
+    }, // Colors
+    IText(14.f, EAlign::Center, COLOR_WHITE), // Label text
+    IText(14.f, EVAlign::Bottom, COLOR_WHITE) // Value text
+    };
+    IText labelTexts{ 20.f, COLOR_WHITE, "Ariblk", EAlign::Center };
+    IColor frameColor{ 255, 0, 0, 0 };
+    IColor trackColor{ 255, 160, 175, 160 };
+    IColor backgroundColor{ 255, 4, 35, 4 };
+
     pGraphics->AttachCornerResizer(EUIResizerMode::Scale, false);
     pGraphics->AttachPanelBackground(COLOR_GRAY);
     pGraphics->LoadFont("Roboto-Regular", ROBOTO_FN);
+    pGraphics->LoadFont("Arialbd", ARIALBD_FN);
+    pGraphics->LoadFont("Ariblk", ARIBLK_FN);
     const IRECT b = pGraphics->GetBounds();
 
-    pGraphics->AttachControl(new CqtVisual(b), kCtrlTagCqtVis, "");
+    const float controlYFrac = 0.1;
+    const float magXFrac = 0.7;
+    const float numControls = 4.f;
+
+    auto controlRect = b.GetReducedFromBottom((1.f - controlYFrac) * b.H());
+    auto visRect = b.GetReducedFromTop(controlYFrac * b.H());
+
+    // controls
+    const float translateIncr = (numControls - 1.f) / (numControls);
+    controlRect.ReduceFromRight(translateIncr * controlRect.W());
+    pGraphics->AttachControl(new ICaptionControl(controlRect, kTuning, IText(24.f), DEFAULT_FGCOLOR, false), kNoTag, "");
+    controlRect.Translate(controlRect.W(), 0.f);
+    pGraphics->AttachControl(new IVNumberBoxControl(controlRect, kChannel, nullptr, "Channel", style), kNoTag, "");
+    controlRect.Translate(controlRect.W(), 0.f);
+    pGraphics->AttachControl(new ICaptionControl(controlRect, kMagMin, IText(24.f), DEFAULT_FGCOLOR, false), kNoTag, "");
+    controlRect.Translate(controlRect.W(), 0.f);
+    pGraphics->AttachControl(new ICaptionControl(controlRect, kMagMax, IText(24.f), DEFAULT_FGCOLOR, false), kNoTag, "");
+
+    // visuals
+    auto magRect = visRect.GetReducedFromRight((1.f - magXFrac) * visRect.W());
+    pGraphics->AttachControl(new ICqtMagnitudes<BinsPerOctave, OctaveNumber>(magRect, style), kCtrlTagCqtVis, "");
+    auto chromaRect = visRect.GetReducedFromLeft(magXFrac * visRect.W()).GetReducedFromBottom(0.5f * visRect.H());
+    pGraphics->AttachControl(new IChromaFeature<BinsPerOctave>(chromaRect, style), kCtrlTagChromaVis, "");
+    auto oMagRect = visRect.GetReducedFromLeft(magXFrac * visRect.W()).GetReducedFromTop(0.5f * visRect.H());
+    pGraphics->AttachControl(new IOctaveMagnitudes<OctaveNumber>(oMagRect, style), kCtrlTagOctaveMagnitudesVis, "");
   };
 #endif
 
@@ -40,11 +96,17 @@ CqtAnalyzer::CqtAnalyzer(const InstanceInfo& info)
 void CqtAnalyzer::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 {
   const int nChans = NOutChansConnected();
+  if (nChans != mNumChans) // TODO: do this on idle?
+  {
+      mNumChans = nChans;
+      GetParam(kChannel)->InitInt("Channel", 0, 0, mNumChans, "");
+      setDirty(false); 
+  }
 
   // send data into cqt filter bank
   for (int i = 0; i < nFrames; i++)
   {
-      mCqtSampleBuffer[i] = inputs[0][i];
+      mCqtSampleBuffer[i] = inputs[mChannel][i];
   }
   mCqt.inputBlock(mCqtSampleBuffer.data(), nFrames);
 
@@ -64,12 +126,15 @@ void CqtAnalyzer::threadedCqtCall(const Cqt::ScheduleElement schedule)
     auto cqtData = mCqt.getOctaveCqtBuffer(schedule.octave);
     // send data to gui
     mSenderBuffer[schedule.octave].vals[0][0] = static_cast<double>(schedule.octave);
+    mSenderBuffer[schedule.octave].vals[0][1] = mMagMin;
+    mSenderBuffer[schedule.octave].vals[0][2] = mMagMax;
+    mSenderBuffer[schedule.octave].vals[0][3] = mTuning;
     for (size_t tone = 0; tone < BinsPerOctave; tone++)
     {
         const double realD = (*cqtData)[tone].real();
         const double imagD = (*cqtData)[tone].imag();
         const double magnitude = std::sqrt(std::pow(realD, 2) + std::pow(imagD, 2));
-        mSenderBuffer[schedule.octave].vals[0][tone + 1] = magnitude;
+        mSenderBuffer[schedule.octave].vals[0][tone + 4] = magnitude;
         mCqtDataStorage[schedule.octave][tone] = magnitude;
     }
     // push octave data
@@ -142,7 +207,32 @@ void CqtAnalyzer::OnReset()
 
 void CqtAnalyzer::OnParamChange(int paramIdx)
 {
+    switch (paramIdx)
+    {
+        case kTuning:
+        {
+            mCqt.setConcertPitch(GetParam(paramIdx)->Value());
+            mTuning = GetParam(paramIdx)->Value();
+            break;
+        }
+        case kChannel:
+        {
+            mChannel = GetParam(paramIdx)->Int();
+            break;
+        }
+        case kMagMin:
+        {
+            mMagMin = GetParam(paramIdx)->Value();
+            break;
+        }
+        case kMagMax:
+        {
+            mMagMax = GetParam(paramIdx)->Value();
+            break;
+        }
+    }
 }
+
 
 void CqtAnalyzer::OnIdle() 
 { 

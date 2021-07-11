@@ -2,23 +2,20 @@
 
 #include "IControl.h"
 
-template<int ChannelNumber, int OctaveNumber>
-class OctaveEnvelopeVisual : public IControl
+template<int OctaveNumber>
+class IOctaveMagnitudes : public IControl
 {
 public:
-	OctaveEnvelopeVisual(const IRECT& bounds, const IVStyle& style) : IControl(bounds)
+	IOctaveMagnitudes(const IRECT& bounds, const IVStyle& style) : IControl(bounds)
 	{
-		for (int ch = 0; ch < ChannelNumber; ch++)
+		for (int octave = 0; octave < OctaveNumber; octave++)
 		{
-			for (int octave = 0; octave < OctaveNumber; octave++)
-			{
-				mOctaveEnvelopeFeature[ch][octave] = 0.;
-				mOctaveEnvelopeFeatureDb[ch][octave] = -80.;
-			}
+			mOctaveEnvelopeFeature[octave] = 0.;
+			mOctaveEnvelopeFeatureDb[octave] = -80.;
 		}
 		mLabelText = style.valueText;
 	};
-	~OctaveEnvelopeVisual() = default;
+	~IOctaveMagnitudes() = default;
 
 	void Draw(IGraphics& g) override
 	{
@@ -37,17 +34,14 @@ public:
 		//Arc for each octave, cut at 0. value like processing does
 		float arcAngleIncr = 360.f / static_cast<float>(OctaveNumber);
 		float angle = 0.f;
-		for (int ch = 0; ch < ChannelNumber; ch++)
+		const float colorFadeIncr = 1.f / (static_cast<float>(OctaveNumber));
+		for (int octave = OctaveNumber - 1; octave >= 0; octave--)
 		{
-			for (int octave = OctaveNumber - 1; octave >= 0; octave--)
-			{
-				const float rMapping = 1. / 80.f * (mOctaveEnvelopeFeatureDb[ch][octave] + 80.f);
-				float toneR = rMapping * r;
-				if (toneR < 0.f) toneR = 0.f;
-				//g.DrawArc(mToneColors[octave], xc, yc, r, angle, angle + arcAngleIncr);
-				g.FillArc(mToneColors[ch], xc, yc, toneR, angle, angle + arcAngleIncr);
-				angle += arcAngleIncr;
-			}
+			const float rMapping = 1. / 80.f * (mOctaveEnvelopeFeatureDb[octave] + 80.f);
+			float toneR = rMapping * r;
+			if (toneR < 0.f) toneR = 0.f;
+			g.FillArc(IColor::FromHSLA(static_cast<float>(OctaveNumber - octave - 1) * colorFadeIncr, 0.7, 0.3, 1.f), xc, yc, toneR, angle, angle + arcAngleIncr);
+			angle += arcAngleIncr;
 		}
 		//Octave Strings
 		IText text;
@@ -85,31 +79,25 @@ public:
 	{
 		IByteStream stream(pData, dataSize);
 		int pos = 0;
-		ISenderData<ChannelNumber, std::array<double, OctaveNumber>> d;
+		ISenderData<1, std::array<double, OctaveNumber>> d;
 		pos = stream.Get(&d, pos);
-		for (int ch = 0; ch < ChannelNumber; ch++)
+		for (int octave = 0; octave < OctaveNumber; octave++)
 		{
-			for (int octave = 0; octave < OctaveNumber; octave++)
-			{
-				mOctaveEnvelopeFeature[ch][octave] = mOctaveEnvelopeFeature[ch][octave] * 0.9 + 0.1 * d.vals[ch][octave];
-			}
+			mOctaveEnvelopeFeature[octave] = mOctaveEnvelopeFeature[octave] * 0.9 + 0.1 * d.vals[0][octave];
 		}
 		// Normalize feature
 		double max = -1.;
-		for (int ch = 0; ch < ChannelNumber; ch++)
+		for (int octave = 0; octave < OctaveNumber; octave++)
 		{
-			for (int octave = 0; octave < OctaveNumber; octave++)
-			{
-				mOctaveEnvelopeFeatureDb[ch][octave] = AmpToDB(mOctaveEnvelopeFeature[ch][octave]);
-			}
+			mOctaveEnvelopeFeatureDb[octave] = AmpToDB(mOctaveEnvelopeFeature[octave]);
 		}
 		SetDirty(false);
 	};
 private:
-	double mOctaveEnvelopeFeature[ChannelNumber][OctaveNumber];
-	double mOctaveEnvelopeFeatureDb[ChannelNumber][OctaveNumber];
+	double mOctaveEnvelopeFeature[OctaveNumber];
+	double mOctaveEnvelopeFeatureDb[OctaveNumber];
 	IColor mBackgroundColor{ COLOR_BLACK };
-	const IColor mToneColors[ChannelNumber] = { {204,0,90,190}, {125,255,230,0} };
+	//const IColor mToneColors = {204,0,90,190};
 	const std::string mOctaves[OctaveNumber] = { "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9"};
 	IText mLabelText;
 };

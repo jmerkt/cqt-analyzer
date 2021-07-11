@@ -369,16 +369,16 @@
     <ClInclude Include="..\..\..\..\lib\FFTDomain\ConstantQTransform.h">
       <Filter>Cqt</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\gui\CqtVisual.h">
+    <ClInclude Include="..\..\include\gui\ICqtMagnitudes.h">
       <Filter>gui</Filter>
     </ClInclude>
     <ClInclude Include="..\..\include\TimerMt.h">
       <Filter>helpers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\gui\ChromaVisual.h">
+    <ClInclude Include="..\..\include\gui\IChromaFeature.h">
       <Filter>gui</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\include\gui\OctaveEnvelopeVisual.h">
+    <ClInclude Include="..\..\include\gui\IOctaveMagnitudes.h">
       <Filter>gui</Filter>
     </ClInclude>
   </ItemGroup>

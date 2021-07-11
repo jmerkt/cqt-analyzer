@@ -16,14 +16,17 @@
 
 constexpr int BinsPerOctave{ 12 };
 constexpr int OctaveNumber{ 9 };
-constexpr int OctaveBufferSize{ BinsPerOctave + 1 };
+constexpr int OctaveBufferSize{ BinsPerOctave + 4 };
 constexpr size_t FeatureUpdateRate{ 50 };
 
 const int kNumPresets = 1;
 
 enum EParams
 {
-  kPlaceholder = 0,
+  kTuning = 0,
+  kChannel,
+  kMagMin,
+  kMagMax,
   kNumParams
 };
 
@@ -74,6 +77,12 @@ public:
   double mCqtDataStorage[OctaveNumber][BinsPerOctave];
   double mChromaFeature[BinsPerOctave];
   double mOctaveMagnitudes[OctaveNumber];
+
+  int mNumChans{ 1 };
+  int mChannel{ 0 };
+  double mMagMin{ -120. };
+  double mMagMax{ 0. };
+  double mTuning{ 440. };
 
   const double mOctaveOverlaps[OctaveNumber] = {0., 0.1, 0.2, 0.4, 0.6, 0.8, 0.9, 0.925, 0.95};
   const double mOctaveEqualization[OctaveNumber] = {1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};

@@ -150,6 +150,8 @@ END
 BEGIN
     "#include ""..\\config.h""\r\n"
     "ROBOTO_FN TTF ROBOTO_FN\0"
+	"ARIALBD_FN TTF ARIALBD_FN\0"
+	"ARIBLK_FN TTF ARIBLK_FN\0"
 END
 
 #endif    // APSTUDIO_INVOKED
@@ -230,6 +232,8 @@ END
 //
 #include "..\config.h"
 ROBOTO_FN TTF ROBOTO_FN
+ARIBLK_FN TTF ARIBLK_FN
+ARIALBD_FN TTF ARIALBD_FN
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED
 

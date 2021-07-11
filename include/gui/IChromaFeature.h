@@ -2,22 +2,19 @@
 
 #include "IControl.h"
 
-template<int ChannelNumber, int B>
-class ChromaVisual : public IControl
+template<int B>
+class IChromaFeature : public IControl
 {
 public:
-	ChromaVisual(const IRECT& bounds, const IVStyle& style) : IControl(bounds)
+	IChromaFeature(const IRECT& bounds, const IVStyle& style) : IControl(bounds)
 	{
-		for (int ch = 0; ch < ChannelNumber; ch++)
+		for (int tone = 0; tone < B; tone++)
 		{
-			for (int tone = 0; tone < B; tone++)
-			{
-				mChromaFeature[ch][tone] = 0.;
-			}
+			mChromaFeature[tone] = 0.;
 		}
 		mLabelText = style.valueText;
 	};
-	~ChromaVisual() = default;
+	~IChromaFeature() = default;
 
 	void Draw(IGraphics& g) override
 	{
@@ -37,15 +34,13 @@ public:
 		//Arc for each tone, cut at 0. value like processing does
 		float arcAngleIncr = 360.f / static_cast<float>(B);
 		float angle = 0.f;
-		for (int ch = 0; ch < ChannelNumber; ch++)
+		const float colorFadeIncr = 1.f / (static_cast<float>(B));
+		for (int tone = 0; tone < B; tone++)
 		{
-			for (int tone = 0; tone < B; tone++)
-			{
-				float toneR = mChromaFeature[ch][tone] * r;
-				if (toneR < 0.f) toneR = 0.f;
-				g.FillArc(mToneColors[ch], xc, yc, toneR, angle, angle + arcAngleIncr);
-				angle += arcAngleIncr;
-			}
+			float toneR = mChromaFeature[tone] * r;
+			if (toneR < 0.f) toneR = 0.f;
+			g.FillArc(IColor::FromHSLA(static_cast<float>(tone) * colorFadeIncr, 0.7, 0.3, 1.f), xc, yc, toneR, angle, angle + arcAngleIncr);
+			angle += arcAngleIncr;
 		}
 		//Töne Buchstaben
 		IText text;
@@ -82,22 +77,19 @@ public:
 	{
 		IByteStream stream(pData, dataSize);
 		int pos = 0;
-		ISenderData<ChannelNumber, std::array<double, B>> d;
+		ISenderData<1, std::array<double, B>> d;
 		pos = stream.Get(&d, pos);
-		for(int ch = 0; ch < ChannelNumber; ch++)
-		{ 
-			for (int tone = 0; tone < B; tone++)
-			{
-				mChromaFeature[ch][tone] = mChromaFeature[ch][tone] * 0.9 + 0.1 * d.vals[ch][tone];
-			}
+		for (int tone = 0; tone < B; tone++)
+		{
+			mChromaFeature[tone] = mChromaFeature[tone] * 0.9 + 0.1 * d.vals[0][tone];
 		}
 		SetDirty(false);
 	};
 private:
 	// TODO: COLORS MATCHING (SIMILAR) FOR F0 and its quint / quart! - Take the colors of circle of fifth inspiration maybe and a bit tranparency
-	double mChromaFeature[ChannelNumber][B];
+	double mChromaFeature[B];
 	IColor mBackgroundColor{ COLOR_BLACK };
-	const IColor mToneColors[ChannelNumber] = { {204,0,90,190}, {125,255,230,0} };
+	//const IColor mToneColors = {204,0,90,190};
 	const std::string mNotes[B] = { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
 
 	IText mLabelText;
