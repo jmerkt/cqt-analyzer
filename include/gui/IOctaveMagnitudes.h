@@ -97,7 +97,6 @@ private:
 	double mOctaveEnvelopeFeature[OctaveNumber];
 	double mOctaveEnvelopeFeatureDb[OctaveNumber];
 	IColor mBackgroundColor{ COLOR_BLACK };
-	//const IColor mToneColors = {204,0,90,190};
 	const std::string mOctaves[OctaveNumber] = { "A1", "A2", "A3", "A4", "A5", "A6", "A7", "A8", "A9"};
 	IText mLabelText;
 };

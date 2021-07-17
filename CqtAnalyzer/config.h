@@ -1,7 +1,7 @@
 #define PLUG_NAME "CqtAnalyzer"
 #define PLUG_MFR "ChromaDSP"
-#define PLUG_VERSION_HEX 0x00010000
-#define PLUG_VERSION_STR "1.0.0"
+#define PLUG_VERSION_HEX 0x00000001
+#define PLUG_VERSION_STR "0.0.1"
 #define PLUG_UNIQUE_ID 'ctAn'
 #define PLUG_MFR_ID 'chrD'
 #define PLUG_URL_STR "https://ChromaDSP.com"
@@ -24,8 +24,8 @@
 #define PLUG_DOES_MPE 0
 #define PLUG_DOES_STATE_CHUNKS 0
 #define PLUG_HAS_UI 1
-#define PLUG_WIDTH 1000
-#define PLUG_HEIGHT 450
+#define PLUG_WIDTH 1100
+#define PLUG_HEIGHT 550
 #define PLUG_FPS 60
 #define PLUG_SHARED_RESOURCES 0
 #define PLUG_HOST_RESIZE 0

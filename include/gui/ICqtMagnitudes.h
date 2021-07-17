@@ -1,6 +1,8 @@
 #pragma once
 
 #include "IControl.h"
+#include <sstream>
+#include <iomanip>
 
 
 class IMagnitudeMeter : public IControl
@@ -22,7 +24,7 @@ public:
 	}
 	void setValue(double value) 
 	{
-		mValue = value * 0.25 + mValue * 0.75;
+		mValue = value * 0.3 + mValue * 0.7;
 	};
 	double getValue() 
 	{
@@ -80,9 +82,24 @@ public:
 		{
 			const double fRef = std::pow(2., ((100. - 49.) / 12.)) * mTuning;
 			const double freq = (fRef / std::pow(2., (OctaveNumber - o))) * std::pow(2., static_cast<double>(B + 9) / static_cast<double>(B));
-			g.DrawText(text, std::to_string(static_cast<int>(std::round(freq))).c_str(), labelRect);
-			g.DrawRect(IColor::FromHSLA(static_cast<float>(o) * colorFadeIncr, 0.7, 0.3, 1.f), labelRect.GetScaledAboutCentre(0.97), 0, 2.f);
+			std::string freqStr = "A" + std::to_string(o + 1) + ": ";
+			if (freq < 1000.)
+			{
+				freqStr += std::to_string(static_cast<int>(std::round(freq))) + " Hz";
+			}
+			else
+			{
+				std::ostringstream streamObj;
+				streamObj << std::fixed;
+				streamObj << std::setprecision(2);
+				streamObj << freq / 1000.;
+				freqStr += streamObj.str() + " kHz";
+			}
+			g.DrawText(text, freqStr.c_str(), labelRect);
+
+			g.DrawRect(IColor::FromHSLA(static_cast<float>(o) * colorFadeIncr, 0.7, 0.3, 1.f), labelRect.GetScaledAboutCentre(0.925f), 0, 6.f);
 			g.DrawDottedLine(COLOR_WHITE, labelRect.R, mRECT.T, labelRect.R, mRECT.B);
+
 			labelRect.Translate(labelRect.W(), 0.f);
 		}
 

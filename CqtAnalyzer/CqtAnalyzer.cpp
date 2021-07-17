@@ -10,9 +10,9 @@ CqtAnalyzer::CqtAnalyzer(const InstanceInfo& info)
 {
   // controls
   GetParam(kTuning)->InitDouble("Tuning", 440., 415., 465.0, 0.01, "Hz");
-  GetParam(kChannel)->InitInt("Channel", 0, 0, 1, "");
-  GetParam(kMagMin)->InitDouble("MagMin", -100., -120., 20., 5., "dB");
-  GetParam(kMagMax)->InitDouble("MagMax", 0., -120., 20., 5., "dB");
+  GetParam(kChannel)->InitEnum("Channel", 0, 1, "", IParam::kFlagsNone, "");
+  GetParam(kMagMin)->InitDouble("MagMin", -60., -120., 20., 1., "dB");
+  GetParam(kMagMax)->InitDouble("MagMax", 0., -120., 20., 1., "dB");
 
 #if IPLUG_EDITOR // http://bit.ly/2S64BDd
   mMakeGraphicsFunc = [&]() 
@@ -41,42 +41,76 @@ CqtAnalyzer::CqtAnalyzer(const InstanceInfo& info)
     IText(14.f, EVAlign::Bottom, COLOR_WHITE) // Value text
     };
     IText labelTexts{ 20.f, COLOR_WHITE, "Ariblk", EAlign::Center };
-    IColor frameColor{ 255, 0, 0, 0 };
-    IColor trackColor{ 255, 160, 175, 160 };
-    IColor backgroundColor{ 255, 4, 35, 4 };
+    IColor backgroundColor{ 255, 13, 7, 63 };
 
     pGraphics->AttachCornerResizer(EUIResizerMode::Scale, false);
-    pGraphics->AttachPanelBackground(COLOR_GRAY);
-    pGraphics->LoadFont("Roboto-Regular", ROBOTO_FN);
+    pGraphics->AttachPanelBackground(backgroundColor);
+
+    pGraphics->LoadFont("Roboto-Regular", ARIALBD_FN);
     pGraphics->LoadFont("Arialbd", ARIALBD_FN);
     pGraphics->LoadFont("Ariblk", ARIBLK_FN);
-    const IRECT b = pGraphics->GetBounds();
+    IRECT b = pGraphics->GetBounds();
 
-    const float controlYFrac = 0.1;
-    const float magXFrac = 0.7;
-    const float numControls = 4.f;
+    const float controlYFrac = 0.04;
+    const float headingYFrac = 0.08;
+    const float magXFrac = 0.8; 
 
     auto controlRect = b.GetReducedFromBottom((1.f - controlYFrac) * b.H());
-    auto visRect = b.GetReducedFromTop(controlYFrac * b.H());
+    controlRect.ReduceFromRight((1.f - magXFrac) * b.W());
+
+    auto spectrumRect = b.GetReducedFromTop((controlYFrac) * b.H());
+    spectrumRect.ReduceFromBottom(headingYFrac * b.H());
+    spectrumRect.ReduceFromRight((1.f - magXFrac) * b.W());
+
+    auto featureRect = b.GetReducedFromLeft(magXFrac * b.W());
+    featureRect.ReduceFromBottom(headingYFrac * b.H());
+
+    auto headingRect = b.GetReducedFromTop((1.f - headingYFrac) * b.H());
 
     // controls
-    const float translateIncr = (numControls - 1.f) / (numControls);
-    controlRect.ReduceFromRight(translateIncr * controlRect.W());
-    pGraphics->AttachControl(new ICaptionControl(controlRect, kTuning, IText(24.f), DEFAULT_FGCOLOR, false), kNoTag, "");
-    controlRect.Translate(controlRect.W(), 0.f);
-    pGraphics->AttachControl(new IVNumberBoxControl(controlRect, kChannel, nullptr, "Channel", style), kNoTag, "");
-    controlRect.Translate(controlRect.W(), 0.f);
-    pGraphics->AttachControl(new ICaptionControl(controlRect, kMagMin, IText(24.f), DEFAULT_FGCOLOR, false), kNoTag, "");
-    controlRect.Translate(controlRect.W(), 0.f);
-    pGraphics->AttachControl(new ICaptionControl(controlRect, kMagMax, IText(24.f), DEFAULT_FGCOLOR, false), kNoTag, "");
+    const float numControls = 4.f;
+    const float numLabels = 3.f;
+    const float controlWidth = 1.f / (numControls + numLabels);
+    const float controlFill = 0.8f;
+    IText labelText{ 15.f, COLOR_WHITE, "Ariblk", EAlign::Center };
 
-    // visuals
-    auto magRect = visRect.GetReducedFromRight((1.f - magXFrac) * visRect.W());
-    pGraphics->AttachControl(new ICqtMagnitudes<BinsPerOctave, OctaveNumber>(magRect, style), kCtrlTagCqtVis, "");
-    auto chromaRect = visRect.GetReducedFromLeft(magXFrac * visRect.W()).GetReducedFromBottom(0.5f * visRect.H());
+    controlRect.ReduceFromRight((1.f - controlWidth) * controlRect.W());
+    pGraphics->AttachControl(new ITextControl(controlRect, "Channel: ", labelText));
+    controlRect.Translate(controlRect.W(), 0.f);
+    pGraphics->AttachControl(new ICaptionControl(controlRect.GetScaledAboutCentre(controlFill), kChannel, IText(15.f), DEFAULT_FGCOLOR, true), kNoTag, "");
+    controlRect.Translate(controlRect.W(), 0.f);
+    pGraphics->AttachControl(new ITextControl(controlRect, "Range: ", labelText));
+    controlRect.Translate(controlRect.W(), 0.f);
+    pGraphics->AttachControl(new ICaptionControl(controlRect.GetScaledAboutCentre(controlFill), kMagMin, IText(15.f), DEFAULT_FGCOLOR, true), kNoTag, "");
+    controlRect.Translate(controlRect.W(), 0.f);
+    pGraphics->AttachControl(new ICaptionControl(controlRect.GetScaledAboutCentre(controlFill), kMagMax, IText(15.f), DEFAULT_FGCOLOR, true), kNoTag, "");
+    controlRect.Translate(controlRect.W(), 0.f);
+    pGraphics->AttachControl(new ITextControl(controlRect, "Tuning: ", labelText));
+    controlRect.Translate(controlRect.W(), 0.f);
+    pGraphics->AttachControl(new ICaptionControl(controlRect.GetScaledAboutCentre(controlFill), kTuning, IText(15.f), DEFAULT_FGCOLOR, true), kNoTag, "");
+    
+
+    // spectrum
+    pGraphics->AttachControl(new ICqtMagnitudes<BinsPerOctave, OctaveNumber>(spectrumRect, style), kCtrlTagCqtVis, "");
+
+    //features
+    const float midGap = 0.01f;
+    auto chromaRect = featureRect.GetReducedFromBottom(featureRect.H() / 2.f + featureRect.H() * midGap);
     pGraphics->AttachControl(new IChromaFeature<BinsPerOctave>(chromaRect, style), kCtrlTagChromaVis, "");
-    auto oMagRect = visRect.GetReducedFromLeft(magXFrac * visRect.W()).GetReducedFromTop(0.5f * visRect.H());
-    pGraphics->AttachControl(new IOctaveMagnitudes<OctaveNumber>(oMagRect, style), kCtrlTagOctaveMagnitudesVis, "");
+    auto magRect = featureRect.GetReducedFromTop(featureRect.H() / 2.f + featureRect.H() * midGap);
+    pGraphics->AttachControl(new IOctaveMagnitudes<OctaveNumber>(magRect, style), kCtrlTagOctaveMagnitudesVis, "");
+
+    // heading
+    const float sideGap = 0.02f;
+    IText headingText{ 30.f, COLOR_WHITE, "Ariblk", EAlign::Center };
+    pGraphics->AttachControl(new ITextControl(headingRect, "", headingText, IColor{ 255, 0, 0, 0 }));
+    pGraphics->AttachControl(new ITextControl(headingRect, "CqtAnalyzer", headingText));
+    IText versionText{ 18.f, COLOR_WHITE, "Ariblk", EAlign::Near };
+    std::string version = std::string("Version ") + PLUG_VERSION_STR;
+    pGraphics->AttachControl(new ITextControl(headingRect.GetReducedFromLeft(sideGap * headingRect.W()), version.c_str(), versionText));
+    IText webpageText{ 18.f, COLOR_WHITE, "Ariblk", EAlign::Far };
+    pGraphics->AttachControl(new ITextControl(headingRect.GetReducedFromRight(sideGap * headingRect.W()), "www.ChromaDSP.com", webpageText));
+
   };
 #endif
 
@@ -95,12 +129,12 @@ CqtAnalyzer::CqtAnalyzer(const InstanceInfo& info)
 #if IPLUG_DSP
 void CqtAnalyzer::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
 {
-  const int nChans = NOutChansConnected();
-  if (nChans != mNumChans) // TODO: do this on idle?
+  const int nOutChans = NOutChansConnected();
+  const int nInChans = NInChansConnected();
+  if (nInChans != mNumChans)
   {
-      mNumChans = nChans;
-      GetParam(kChannel)->InitInt("Channel", 0, 0, mNumChans, "");
-      setDirty(false); 
+      mNumChans = nInChans;
+      numChansChanged.store(true);
   }
 
   // send data into cqt filter bank
@@ -113,7 +147,7 @@ void CqtAnalyzer::ProcessBlock(sample** inputs, sample** outputs, int nFrames)
   // bypass audio
   for (int s = 0; s < nFrames; s++) 
   {
-    for (int c = 0; c < nChans; c++) 
+    for (int c = 0; c < nOutChans; c++)
     {
       outputs[c][s] = inputs[c][s];
     }
@@ -149,7 +183,7 @@ void CqtAnalyzer::OnReset()
     const int blockSize = GetBlockSize();
 
     // initialize the cqt
-    mCqt.init(0.5, 100, {std::begin(mOctaveOverlaps), std::end(mOctaveOverlaps)}, {std::begin(mOctaveEqualization), std::end(mOctaveEqualization)});
+    mCqt.init(0.5, {std::begin(mOctaveOverlaps), std::end(mOctaveOverlaps)});
     mCqt.initFs(samplerate, blockSize);
     mCqtSampleBuffer.resize(blockSize, 0.);
 
@@ -242,6 +276,17 @@ void CqtAnalyzer::OnIdle()
     } 
     mChromaFeatureSender.TransmitData(*this); 
     mOctaveMagnitudesSender.TransmitData(*this);
+
+    if (numChansChanged.load())
+    {
+        numChansChanged.store(false);
+        GetParam(kChannel)->InitEnum("Channel", 0, mNumChans, "", IParam::kFlagsNone, "");
+        for (int i = 0; i < mNumChans; i++)
+        {
+            GetParam(kChannel)->SetDisplayText(i, std::to_string(i).c_str());
+        }
+        setDirty(false);
+    }
 };
 
 void CqtAnalyzer::updateChromaFeature()
