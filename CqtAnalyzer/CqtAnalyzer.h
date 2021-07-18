@@ -9,9 +9,12 @@
 #endif
 
 /*
-* TODO: Multichannel - channel selection
+* TODO: 
 * 
-* (Leaky integration for GUI)
+* Elaborated way to set latency per octave
+* Hüllkurve???? -> ansonsten schwer zu interpretierendes spektrum: Choose whether to display envelope / tones / both
+* 
+* (CQT-GUI as shared pointer to change its values directly! - magMin, magMax, Potential line spacing argument - at the moment race conditions on mMag)
 */
 
 
@@ -53,6 +56,7 @@ public:
   void OnParamChange(int paramIdx)  override;
   void OnIdle()  override;
 
+private:
   std::vector<double> mCqtSampleBuffer;
   Cqt::ConstantQTransform<BinsPerOctave, OctaveNumber> mCqt;
 
@@ -86,7 +90,7 @@ public:
   double mMagMax{ 0. };
   double mTuning{ 440. };
 
-  const double mOctaveOverlaps[OctaveNumber] = {0., 0.1, 0.2, 0.4, 0.6, 0.8, 0.9, 0.95, 0.975};
+  const double mOctaveOverlaps[OctaveNumber] = {0., 0.1, 0.25, 0.5, 0.75, 0.85, 0.925, 0.9625, 0.981};
 
 #endif
 };

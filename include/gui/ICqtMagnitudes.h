@@ -69,6 +69,7 @@ public:
 	void Draw(IGraphics& g) override 
 	{
 		g.FillRect(mBackgroundColor, mRECT);
+
 		// x-axis labels
 		IText text;
 		text.mSize = 12.;
@@ -103,27 +104,28 @@ public:
 			labelRect.Translate(labelRect.W(), 0.f);
 		}
 
-			
-
-		// TODO: still an offset for numbers != % 5 == 0 
-
-		// y-axis labels
+		// y-axis line and labels
+		const float labelHeight = mRECT.H() - mXAxisMargin * mRECT.H();
 		const double range = mMagMax - mMagMin;
-		const float numLines = std::floor(range / mYAxisLabelSpacing);
-		float yPos = mRECT.T;
+		const int numLines = static_cast<int>(std::ceil(range / mYAxisLabelSpacing));
+		float yValLine = mMagMax;
 		for (int i = 0; i < numLines; i++)
 		{
+			const float yPos = mRECT.T + ((mMagMax - yValLine) / (mMagMax - mMagMin)) * labelHeight;
 			g.DrawLine(COLOR_WHITE, mYAxisMargin * mRECT.W(), yPos, mRECT.W(), yPos);
-			yPos += (1.f - mXAxisMargin) * mRECT.H() / numLines;
+			yValLine -= mYAxisLabelSpacing;
 		}
-		const float numLabels = std::floor(range / mYAxisLabelSpacing);
-		labelRect = mRECT.GetReducedFromRight((1.f - mYAxisMargin) * mRECT.W()).GetReducedFromBottom(mXAxisMargin * mRECT.H());
-		labelRect.ReduceFromBottom((numLabels - 2.f) / numLabels * labelRect.H());
+
+		const int numLabels = static_cast<int>(std::floor(range / mYAxisLabelSpacing));
+		labelRect = mRECT.GetReducedFromRight((1.f - mYAxisMargin) * mRECT.W());
+		float yValLabel = mMagMax - mYAxisLabelSpacing;
 		for (int i = 0; i < numLabels; i++)
 		{
+			labelRect.T = mRECT.T + ((mMagMax - (yValLabel + mYAxisLabelSpacing)) / (mMagMax - mMagMin)) * labelHeight;
+			labelRect.B = mRECT.T + ((mMagMax - (yValLabel - mYAxisLabelSpacing)) / (mMagMax - mMagMin)) * labelHeight;
 			std::string label = std::to_string(static_cast<int>(mMagMax) - (i + 1) * static_cast<int>(mYAxisLabelSpacing)) + " dB";
 			g.DrawText(text, label.c_str(), labelRect);
-			labelRect.Translate(0.f, labelRect.H() / 2.f);
+			yValLabel -= mYAxisLabelSpacing;
 		}
 
 		// meters
