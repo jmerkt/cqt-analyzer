@@ -134,13 +134,13 @@
     <ClCompile Include="..\..\submodules\iPlug2\IGraphics\IGraphicsEditorDelegate.cpp">
       <Filter>IGraphics</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\lib\FFT\pffft-master\pffft.c">
+    <ClCompile Include="..\..\submodules\rt-cqt\submodules\pffft\pffft.c">
       <Filter>FFT</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\lib\FFT\pffft-master\pffft_common.c">
+    <ClCompile Include="..\..\submodules\rt-cqt\submodules\pffft\pffft_common.c">
       <Filter>FFT</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\..\lib\FFT\pffft-master\pffft_double.c">
+    <ClCompile Include="..\..\submodules\rt-cqt\submodules\pffft\pffft_double.c">
       <Filter>FFT</Filter>
     </ClCompile>
   </ItemGroup>
@@ -366,9 +366,6 @@
     <ClInclude Include="..\..\submodules\iPlug2\IGraphics\ISender.h">
       <Filter>IGraphics</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\..\lib\FFTDomain\ConstantQTransform.h">
-      <Filter>Cqt</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\include\gui\ICqtMagnitudes.h">
       <Filter>gui</Filter>
     </ClInclude>
@@ -380,6 +377,9 @@
     </ClInclude>
     <ClInclude Include="..\..\include\gui\IOctaveMagnitudes.h">
       <Filter>gui</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\submodules\rt-cqt\include\ConstantQTransform.h">
+      <Filter>Cqt</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

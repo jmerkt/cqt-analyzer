@@ -32,10 +32,10 @@ public:
 private:
     std::thread mThread;
 
-    bool mIsSingleShot = true;
+    bool mIsSingleShot{ true };
 
     std::chrono::milliseconds mInterval{ 0 };
-    std::function<void(void)> mTimeout = nullptr;
+    std::function<void(void)> mTimeout{ nullptr };
 
     void temporize();
 

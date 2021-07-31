@@ -18,20 +18,19 @@ public:
 
 	void Draw(IGraphics& g) override
 	{
-		//Areas for circle and label
+		// areas for circle and label
 		IRECT circleArea = mRECT;
 		IRECT labelArea = mRECT;
 		circleArea.ReduceFromBottom(0.08f * mRECT.H());
 		labelArea.ReduceFromTop(0.92f * mRECT.H());
-		//Write label
+		// label
 		g.DrawText(mLabelText, "Note Distribution", labelArea);
 		//Main empty white Circle
 		float xc = circleArea.MW();
 		float yc = circleArea.MH();
 		float r = circleArea.H() < circleArea.W() ? circleArea.H() / 2.f : circleArea.W() / 2.f;
-		//g.DrawCircle(COLOR_WHITE, xc, yc, r);
 		g.FillCircle(COLOR_BLACK, xc, yc, r);
-		//Arc for each tone, cut at 0. value like processing does
+		// arc for each tone, cut value at 0. 
 		float arcAngleIncr = 360.f / static_cast<float>(B);
 		float angle = 0.f;
 		const float colorFadeIncr = 1.f / (static_cast<float>(B));
@@ -42,7 +41,7 @@ public:
 			g.FillArc(IColor::FromHSLA(static_cast<float>(tone) * colorFadeIncr, 0.7, 0.3, 1.f), xc, yc, toneR, angle, angle + arcAngleIncr);
 			angle += arcAngleIncr;
 		}
-		//Töne Buchstaben
+		// note letters
 		IText text;
 		text.mSize = 22.;
 		text.mFGColor = COLOR_WHITE;
@@ -69,8 +68,6 @@ public:
 			textRect.Translate(xNew - xOrig, -(yNew - yOrig));
 			g.DrawText(text, mNotes[tone].c_str(), textRect);
 		}
-		//Little circle in middle
-		//g.FillCircle(COLOR_WHITE, xc, yc, r * 0.01f);
 	}
 
 	void OnMsgFromDelegate(int msgTag, int dataSize, const void* pData) override
@@ -86,11 +83,8 @@ public:
 		SetDirty(false);
 	};
 private:
-	// TODO: COLORS MATCHING (SIMILAR) FOR F0 and its quint / quart! - Take the colors of circle of fifth inspiration maybe and a bit tranparency
 	double mChromaFeature[B];
 	IColor mBackgroundColor{ COLOR_BLACK };
-	//const IColor mToneColors = {204,0,90,190};
 	const std::string mNotes[B] = { "C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B" };
-
 	IText mLabelText;
 };

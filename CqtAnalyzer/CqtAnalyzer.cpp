@@ -88,7 +88,6 @@ CqtAnalyzer::CqtAnalyzer(const InstanceInfo& info)
     pGraphics->AttachControl(new ITextControl(controlRect, "Tuning: ", labelText));
     controlRect.Translate(controlRect.W(), 0.f);
     pGraphics->AttachControl(new ICaptionControl(controlRect.GetScaledAboutCentre(controlFill), kTuning, IText(15.f), DEFAULT_FGCOLOR, true), kNoTag, "");
-    
 
     // spectrum
     pGraphics->AttachControl(new ICqtMagnitudes<BinsPerOctave, OctaveNumber>(spectrumRect, style), kCtrlTagCqtVis, "");
@@ -167,7 +166,7 @@ void CqtAnalyzer::threadedCqtCall(const Cqt::ScheduleElement schedule)
     {
         const double realD = (*cqtData)[tone].real();
         const double imagD = (*cqtData)[tone].imag();
-        const double magnitude = std::sqrt(std::pow(realD, 2) + std::pow(imagD, 2));
+        const double magnitude = std::sqrt(std::pow(realD, 2) + std::pow(imagD, 2)) * Cqt::WindowAmplitudeLossCompensation;
         mSenderBuffer[schedule.octave].vals[0][tone + 4] = magnitude;
         mCqtDataStorage[schedule.octave][tone] = magnitude;
     }
@@ -183,7 +182,12 @@ void CqtAnalyzer::OnReset()
     const int blockSize = GetBlockSize();
 
     // initialize the cqt
-    mCqt.init(0.5, {std::begin(mOctaveOverlaps), std::end(mOctaveOverlaps)});
+    std::vector<int> hopSizes(OctaveNumber);
+    for (int o = 0; o < OctaveNumber; o++)
+    {
+        hopSizes[o] = Cqt::Fft_Size / std::pow(2, o);
+    }
+    mCqt.init(hopSizes);
     mCqt.initFs(samplerate, blockSize);
     mCqtSampleBuffer.resize(blockSize, 0.);
 

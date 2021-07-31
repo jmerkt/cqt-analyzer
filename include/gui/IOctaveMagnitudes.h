@@ -19,19 +19,19 @@ public:
 
 	void Draw(IGraphics& g) override
 	{
-		//Areas for circle and label
+		// areas for circle and label
 		IRECT circleArea = mRECT;
 		IRECT labelArea = mRECT;
 		circleArea.ReduceFromBottom(0.08f * mRECT.H());
 		labelArea.ReduceFromTop(0.92f * mRECT.H());
-		//Write label
+		// label
 		g.DrawText(mLabelText, "Octave Magnitudes", labelArea);
-		//Main empty white Circle
+		// main empty white Circle
 		float xc = circleArea.MW();
 		float yc = circleArea.MH();
 		float r = circleArea.H() < circleArea.W() ? circleArea.H() / 2.f : circleArea.W() / 2.f;
 		g.FillCircle(COLOR_BLACK, xc, yc, r);
-		//Arc for each octave, cut at 0. value like processing does
+		// arc for each octave, cut values at 0.
 		float arcAngleIncr = 360.f / static_cast<float>(OctaveNumber);
 		float angle = 0.f;
 		const float colorFadeIncr = 1.f / (static_cast<float>(OctaveNumber));
@@ -43,7 +43,7 @@ public:
 			g.FillArc(IColor::FromHSLA(static_cast<float>(OctaveNumber - octave - 1) * colorFadeIncr, 0.7, 0.3, 1.f), xc, yc, toneR, angle, angle + arcAngleIncr);
 			angle += arcAngleIncr;
 		}
-		//Octave Strings
+		// octave Strings
 		IText text;
 		text.mSize = 22.;
 		text.mFGColor = COLOR_WHITE;
@@ -70,7 +70,7 @@ public:
 			textRect.Translate(xNew - xOrig, -(yNew - yOrig));
 			g.DrawText(text, mOctaves[octave].c_str(), textRect);
 		}
-		//Separation Line
+		// separation Line
 		g.DrawLine(COLOR_WHITE, xc, yc, xc, yc - r, 0, 3.f);
 		g.FillCircle(COLOR_WHITE, xc, yc, 1.5f);
 	}
@@ -85,7 +85,7 @@ public:
 		{
 			mOctaveEnvelopeFeature[octave] = mOctaveEnvelopeFeature[octave] * 0.9 + 0.1 * d.vals[0][octave];
 		}
-		// Normalize feature
+		// normalize feature
 		double max = -1.;
 		for (int octave = 0; octave < OctaveNumber; octave++)
 		{

@@ -5,17 +5,8 @@
 
 #if IPLUG_DSP
 #include "../include/TimerMt.h"
-#include "../../../lib/FFTDomain/ConstantQTransform.h"
+#include "../submodules/rt-cqt/include/ConstantQTransform.h"
 #endif
-
-/*
-* TODO: 
-* 
-* Elaborated way to set latency per octave
-* Hüllkurve???? -> ansonsten schwer zu interpretierendes spektrum: Choose whether to display envelope / tones / both
-* 
-* (CQT-GUI as shared pointer to change its values directly! - magMin, magMax, Potential line spacing argument - at the moment race conditions on mMag)
-*/
 
 
 constexpr int BinsPerOctave{ 12 };
@@ -89,8 +80,6 @@ private:
   double mMagMin{ -120. };
   double mMagMax{ 0. };
   double mTuning{ 440. };
-
-  const double mOctaveOverlaps[OctaveNumber] = {0., 0.1, 0.25, 0.5, 0.75, 0.85, 0.925, 0.9625, 0.981};
 
 #endif
 };
