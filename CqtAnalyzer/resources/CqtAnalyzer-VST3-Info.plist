@@ -7,7 +7,7 @@
 	<key>CFBundleExecutable</key>
 	<string>CqtAnalyzer</string>
 	<key>CFBundleGetInfoString</key>
-	<string>CqtAnalyzer v1.0.0 Copyright 2020 Acme Inc</string>
+	<string>CqtAnalyzer v0.0.1 ChromaDSP</string>
 	<key>CFBundleIdentifier</key>
 	<string>com.ChromaDSP.vst3.CqtAnalyzer</string>
 	<key>CFBundleInfoDictionaryVersion</key>
@@ -17,11 +17,11 @@
 	<key>CFBundlePackageType</key>
 	<string>BNDL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0.0</string>
+	<string>0.0.1</string>
 	<key>CFBundleSignature</key>
-	<string>Ipef</string>
+	<string>ctAn</string>
 	<key>CFBundleVersion</key>
-	<string>1.0.0</string>
+	<string>0.0.1</string>
 	<key>CSResourcesFileMapped</key>
 	<true/>
 	<key>LSMinimumSystemVersion</key>
