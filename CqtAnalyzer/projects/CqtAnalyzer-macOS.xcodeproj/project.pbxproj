@@ -317,6 +317,9 @@
 		B885CBC52304AE7300D73128 /* IPlugProcessor.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4F8F61A8202807B9003F2573 /* IPlugProcessor.cpp */; };
 		B8E22A0C220268C4007CBF4C /* IPlugVST3_ProcessorBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8E22A0A220268C4007CBF4C /* IPlugVST3_ProcessorBase.cpp */; };
 		B8E22A0D220268C4007CBF4C /* IPlugVST3_ProcessorBase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = B8E22A0A220268C4007CBF4C /* IPlugVST3_ProcessorBase.cpp */; };
+		DD31083126B741EF003C5404 /* pffft_common.c in Sources */ = {isa = PBXBuildFile; fileRef = DD31082E26B741EE003C5404 /* pffft_common.c */; };
+		DD31083226B741EF003C5404 /* pffft_double.c in Sources */ = {isa = PBXBuildFile; fileRef = DD31082F26B741EE003C5404 /* pffft_double.c */; };
+		DD31083326B741EF003C5404 /* pffft.c in Sources */ = {isa = PBXBuildFile; fileRef = DD31083026B741EE003C5404 /* pffft.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -782,6 +785,9 @@
 		B8E22A0A220268C4007CBF4C /* IPlugVST3_ProcessorBase.cpp */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.cpp.cpp; name = IPlugVST3_ProcessorBase.cpp; path = ../../submodules/iPlug2/IPlug/VST3/IPlugVST3_ProcessorBase.cpp; sourceTree = "<group>"; tabWidth = 2; };
 		B8E22A0B220268C4007CBF4C /* IPlugVST3_ProcessorBase.h */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.c.h; name = IPlugVST3_ProcessorBase.h; path = ../../submodules/iPlug2/IPlug/VST3/IPlugVST3_ProcessorBase.h; sourceTree = "<group>"; tabWidth = 2; };
 		B8EA6B932203868500D23A86 /* IPlugVST3_Common.h */ = {isa = PBXFileReference; indentWidth = 2; lastKnownFileType = sourcecode.c.h; name = IPlugVST3_Common.h; path = ../../submodules/iPlug2/IPlug/VST3/IPlugVST3_Common.h; sourceTree = "<group>"; tabWidth = 2; };
+		DD31082E26B741EE003C5404 /* pffft_common.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = pffft_common.c; path = "../../submodules/rt-cqt/submodules/pffft/pffft_common.c"; sourceTree = "<group>"; };
+		DD31082F26B741EE003C5404 /* pffft_double.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = pffft_double.c; path = "../../submodules/rt-cqt/submodules/pffft/pffft_double.c"; sourceTree = "<group>"; };
+		DD31083026B741EE003C5404 /* pffft.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; name = pffft.c; path = "../../submodules/rt-cqt/submodules/pffft/pffft.c"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -858,6 +864,9 @@
 		089C166AFE841209C02AAC07 /* IPlugExample */ = {
 			isa = PBXGroup;
 			children = (
+				DD31082E26B741EE003C5404 /* pffft_common.c */,
+				DD31082F26B741EE003C5404 /* pffft_double.c */,
+				DD31083026B741EE003C5404 /* pffft.c */,
 				52FBBED30D0CF143001C8B8A /* config.h */,
 				4F3862EE2014BBEC0009F402 /* CqtAnalyzer.h */,
 				4F3862ED2014BBEC0009F402 /* CqtAnalyzer.cpp */,
@@ -2344,6 +2353,9 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DD31083126B741EF003C5404 /* pffft_common.c in Sources */,
+				DD31083226B741EF003C5404 /* pffft_double.c in Sources */,
+				DD31083326B741EF003C5404 /* pffft.c in Sources */,
 				4F81597C205D50EB00393585 /* baseiids.cpp in Sources */,
 				4FDAC0EC207D76C600299363 /* IPlugTimer.cpp in Sources */,
 				B8E22A0C220268C4007CBF4C /* IPlugVST3_ProcessorBase.cpp in Sources */,
@@ -3283,6 +3295,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(VST3_SDK)",
+					../../submodules/VST3_SDK,
 				);
 				INFOPLIST_FILE = "../resources/CqtAnalyzer-VST3-Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.ChromaDSP.vst3.${BINARY_NAME}";
@@ -3305,6 +3318,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(VST3_SDK)",
+					../../submodules/VST3_SDK,
 				);
 				INFOPLIST_FILE = "../resources/CqtAnalyzer-VST3-Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.ChromaDSP.vst3.${BINARY_NAME}";
@@ -3327,6 +3341,7 @@
 				HEADER_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(VST3_SDK)",
+					../../submodules/VST3_SDK,
 				);
 				INFOPLIST_FILE = "../resources/CqtAnalyzer-VST3-Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = "com.ChromaDSP.vst3.${BINARY_NAME}";
