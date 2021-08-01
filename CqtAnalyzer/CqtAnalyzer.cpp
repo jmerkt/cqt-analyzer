@@ -12,7 +12,7 @@ CqtAnalyzer::CqtAnalyzer(const InstanceInfo& info)
   GetParam(kTuning)->InitDouble("Tuning", 440., 415., 465.0, 0.01, "Hz");
   GetParam(kChannel)->InitEnum("Channel", 0, 1, "", IParam::kFlagsNone, "");
   GetParam(kMagMin)->InitDouble("MagMin", -50., -120., 20., 1., "dB");
-  GetParam(kMagMax)->InitDouble("MagMax", 0., -120., 20., 1., "dB");
+  GetParam(kMagMax)->InitDouble("MagMax", 10., -120., 40., 1., "dB");
 
 #if IPLUG_EDITOR // http://bit.ly/2S64BDd
   mMakeGraphicsFunc = [&]() 
@@ -166,7 +166,7 @@ void CqtAnalyzer::threadedCqtCall(const Cqt::ScheduleElement schedule)
     {
         const double realD = (*cqtData)[tone].real();
         const double imagD = (*cqtData)[tone].imag();
-        const double magnitude = std::sqrt(std::pow(realD, 2) + std::pow(imagD, 2)) * Cqt::WindowAmplitudeLossCompensation;
+        const double magnitude = std::sqrt(std::pow(realD, 2) + std::pow(imagD, 2));
         mSenderBuffer[schedule.octave].vals[0][tone + 4] = magnitude;
         mCqtDataStorage[schedule.octave][tone] = magnitude;
     }
