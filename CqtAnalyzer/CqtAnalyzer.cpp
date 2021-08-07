@@ -271,7 +271,6 @@ void CqtAnalyzer::OnParamChange(int paramIdx)
     }
 }
 
-
 void CqtAnalyzer::OnIdle() 
 { 
     for (int i = 0; i < OctaveNumber; i++)

@@ -25,7 +25,7 @@ public:
 		labelArea.ReduceFromTop(0.92f * mRECT.H());
 		// label
 		g.DrawText(mLabelText, "Note Distribution", labelArea);
-		//Main empty white Circle
+		// main empty black circle
 		float xc = circleArea.MW();
 		float yc = circleArea.MH();
 		float r = circleArea.H() < circleArea.W() ? circleArea.H() / 2.f : circleArea.W() / 2.f;
