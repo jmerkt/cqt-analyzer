@@ -2,7 +2,7 @@
 
 #include "PluginProcessor.h"
 
-#include "../include/gui_juce/MagnitudesComponent.h"
+#include "../include/gui/MagnitudesComponent.h"
 
 //==============================================================================
 class AudioPluginAudioProcessorEditor  : public juce::AudioProcessorEditor
@@ -19,6 +19,8 @@ private:
     // This reference is provided as a quick way for your editor to
     // access the processor object that created it.
     AudioPluginAudioProcessor& processorRef;
+
+    MagnitudesComponent<BinsPerOctave, OctaveNumber> mMagnitudesComponent{ processorRef };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessorEditor)
 };

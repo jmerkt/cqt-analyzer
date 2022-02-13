@@ -12,6 +12,12 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
                      #endif
                        )
 {
+    for (int i = 0; i < OctaveNumber; i++)
+    {
+        Cqt::ScheduleElement schedule;
+        schedule.octave = i;
+        mCqtTimers.push_back(std::make_unique<TimerMt>(std::bind(&AudioPluginAudioProcessor::threadedCqtCall, this, schedule)));
+    }
 }
 
 AudioPluginAudioProcessor::~AudioPluginAudioProcessor()
@@ -86,10 +92,35 @@ void AudioPluginAudioProcessor::changeProgramName (int index, const juce::String
 //==============================================================================
 void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
-    juce::ignoreUnused (sampleRate, samplesPerBlock);
+    // mutex
 
+    // initialize the cqt
+    std::vector<int> hopSizes(OctaveNumber);
+    for (int o = 0; o < OctaveNumber; o++)
+    {
+        hopSizes[o] = Cqt::Fft_Size / std::pow(2, o);
+    }
+    mCqt.init(hopSizes);
+    mCqt.initFs(sampleRate, samplesPerBlock);
+    mCqtSampleBuffer.resize(samplesPerBlock, 0.);
+
+    // reset feature buffers
+    for (int o = 0; o < OctaveNumber; o++)
+    {
+        for (int tone = 0; tone < BinsPerOctave; tone++)
+        {
+            mCqtDataStorage[o][tone] = 0.;
+        }
+    }
+
+    // configure timers
+    for (int i = 0; i < OctaveNumber; i++)
+    {
+        mCqtTimers[i]->stop();
+        mCqtTimers[i]->setSingleShot(false);
+        mCqtTimers[i]->setInterval(std::chrono::milliseconds(static_cast<size_t>(mCqt.getLatencyMs(i))));
+        mCqtTimers[i]->start(true);
+    }
 
 }
 
@@ -141,22 +172,13 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    // Make sure to reset the state if your inner loop is processing
-    // the samples and the outer loop is handling the channels.
-    // Alternatively, you can process the samples with the channels
-    // interleaved by keeping the same state.
-    const int nChans = totalNumInputChannels > 2 ? 2 : totalNumInputChannels;
-    for (int channel = 0; channel < nChans; ++channel)
+
+    auto* channelData = buffer.getReadPointer (mChannel);
+    for(int s = 0; s < buffer.getNumSamples(); s++)
     {
-        auto* channelData = buffer.getWritePointer (channel);
-        juce::ignoreUnused (channelData);
-
-        // ..do something to the data...
-        const int nSamples = buffer.getNumSamples();
-
+        mCqtSampleBuffer[s] = static_cast<double>(channelData[s]);
     }
+    mCqt.inputBlock(mCqtSampleBuffer.data(), buffer.getNumSamples());
 }
 
 //==============================================================================
@@ -191,4 +213,17 @@ void AudioPluginAudioProcessor::setStateInformation (const void* data, int sizeI
 juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {
     return new AudioPluginAudioProcessor();
+}
+
+void AudioPluginAudioProcessor::threadedCqtCall(const Cqt::ScheduleElement schedule)
+{
+    mCqt.cqt(schedule);
+    auto cqtData = mCqt.getOctaveCqtBuffer(schedule.octave);
+    for (size_t tone = 0; tone < BinsPerOctave; tone++)
+    {
+        const double realD = (*cqtData)[tone].real();
+        const double imagD = (*cqtData)[tone].imag();
+        const double magnitude = std::sqrt(std::pow(realD, 2) + std::pow(imagD, 2));
+        mCqtDataStorage[schedule.octave][tone] = magnitude;
+    }
 }

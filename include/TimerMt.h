@@ -45,12 +45,12 @@ private:
 };
 
 
-TimerMt::TimerMt(const std::function<void(void)>& timeout)
+inline TimerMt::TimerMt(const std::function<void(void)>& timeout)
     : mTimeout(timeout)
 {
 }
 
-TimerMt::TimerMt(const std::function<void(void)>& timeout,
+inline TimerMt::TimerMt(const std::function<void(void)>& timeout,
     const std::chrono::milliseconds& interval,
     bool singleShot)
     : mIsSingleShot(singleShot),
@@ -59,12 +59,12 @@ TimerMt::TimerMt(const std::function<void(void)>& timeout,
 {
 }
 
-TimerMt::~TimerMt()
+inline TimerMt::~TimerMt()
 {
     stop();
 }
 
-void TimerMt::start(bool multiThread)
+inline void TimerMt::start(bool multiThread)
 {
     stop();
     {
@@ -83,7 +83,7 @@ void TimerMt::start(bool multiThread)
     }
 }
 
-void TimerMt::stop()
+inline void TimerMt::stop()
 {
     {
         // Set the predicate
@@ -101,17 +101,17 @@ void TimerMt::stop()
 }
 
 
-void TimerMt::setSingleShot(bool singleShot)
+inline void TimerMt::setSingleShot(bool singleShot)
 {
     mIsSingleShot = singleShot;
 }
 
-bool TimerMt::isSingleShot() const
+inline bool TimerMt::isSingleShot() const
 {
     return mIsSingleShot;
 }
 
-void TimerMt::setInterval(const std::chrono::milliseconds& interval)
+inline void TimerMt::setInterval(const std::chrono::milliseconds& interval)
 {
     if (mStopped == false)
         return;
@@ -119,12 +119,12 @@ void TimerMt::setInterval(const std::chrono::milliseconds& interval)
     mInterval = interval;
 }
 
-const std::chrono::milliseconds& TimerMt::interval() const
+inline const std::chrono::milliseconds& TimerMt::interval() const
 {
     return mInterval;
 }
 
-void TimerMt::setTimeout(const std::function<void(void)>& timeout)
+inline void TimerMt::setTimeout(const std::function<void(void)>& timeout)
 {
     if (mStopped == false)
         return;
@@ -132,12 +132,12 @@ void TimerMt::setTimeout(const std::function<void(void)>& timeout)
     mTimeout = timeout;
 }
 
-const std::function<void(void)>& TimerMt::timeout() const
+inline const std::function<void(void)>& TimerMt::timeout() const
 {
     return mTimeout;
 }
 
-void TimerMt::temporize()
+inline void TimerMt::temporize()
 {
     auto locked = std::unique_lock<std::mutex>(mMutex);
 

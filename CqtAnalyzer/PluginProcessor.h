@@ -48,7 +48,7 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     //==============================================================================
-
+    double mCqtDataStorage[OctaveNumber][BinsPerOctave];
 private:
     //==============================================================================
     std::vector<double> mCqtSampleBuffer;
@@ -58,12 +58,13 @@ private:
 
     std::vector<std::unique_ptr<TimerMt>> mCqtTimers;
 
-    double mCqtDataStorage[OctaveNumber][BinsPerOctave];
-
     int mChannel{ 0 };
     double mMagMin{ -50. };
     double mMagMax{ 0. };
     double mTuning{ 440. };
+
+    //==============================================================================
+    //juce::AudioProcessorValueTreeState parameters;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)
