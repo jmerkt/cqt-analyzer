@@ -16,23 +16,24 @@ public:
             g.setColour(mColour);
 			g.fillRect(valueRect);
 		}
-		else
-		{
-			auto valueRect = getBounds();
-			g.setColour(juce::Colours::red);
-			g.fillRect(valueRect);
-		}
     };
 
     void setColour(const juce::Colour colour){mColour = colour;};
 
     void setValue(const double value) 
 	{
-		mValue = value;
+		if(value > mValue)
+		{
+			mValue = 0.3 * value + 0.7 * mValue;
+		}
+		else
+		{
+			mValue = 0.15 * value + 0.85 * mValue;
+		}	
 	};
 
 private:
-    double mValue{ 0.5 };
+    double mValue{ 0. };
     juce::Colour mColour;
 
     //==============================================================================
@@ -47,17 +48,18 @@ public:
 	processorRef (p)
     {
 		// create level meters
+		const float colorFadeIncr = 1.f / (static_cast<float>(OctaveNumber * B));
 		for (int octave = 0; octave < OctaveNumber; octave++) 
 		{
 			for (int tone = 0; tone < B; tone++) 
 			{
                 addAndMakeVisible(mMagnitudeMeters[octave][tone]);
-                mMagnitudeMeters[octave][tone].setColour(mMeterColour);
+                mMagnitudeMeters[octave][tone].setColour(juce::Colour{static_cast<float>(octave * B + tone) * colorFadeIncr, 0.9, 0.5, 1.f});
 			}
 		}
 
 		// timer
-		startTimer(100);
+		startTimer(15);
     }
 
 	~MagnitudesComponent()
@@ -69,18 +71,10 @@ public:
     {
         g.fillAll (mBackgroundColor);
 
-    	// meters
-		for (int octave = 0; octave < OctaveNumber; octave++) 
-		{
-			for (int tone = 0; tone < B; tone++) 
-			{
-                mMagnitudeMeters[octave][tone].paint(g);
-			}
-		}
-
         auto bounds = getBounds();
 
-        g.setFont(12.f / 800.f * static_cast<float>(bounds.getHeight()));
+        g.setFont(12.f / 550.f * static_cast<float>(bounds.getHeight()));
+
 		// x-axis labels
 		const float octaveNumFloat = static_cast<float>(OctaveNumber);
 		auto labelRect = bounds.withTrimmedTop((1.f - mXAxisMargin) * bounds.getHeight());
@@ -108,13 +102,13 @@ public:
             g.setColour(juce::Colours::white);
 			g.drawText(juce::String(freqStr), labelRect, juce::Justification::centred);
 
-            g.setColour(juce::Colour{static_cast<float>(o) * colorFadeIncr, 0.7, 0.3, 1.f});
+            g.setColour(juce::Colour{static_cast<float>(o) * colorFadeIncr, 0.9, 0.5, 1.f});
 			g.drawRect(labelRect.withSizeKeepingCentre(labelRect.getWidth() * 0.925f, labelRect.getHeight() * 0.925f), 6.f);
             g.setColour(juce::Colours::white);
             float dashPattern[2];
             dashPattern[0] = 8.0;
             dashPattern[1] = 8.0;
-			g.drawDashedLine({labelRect.getRight(), bounds.getY(), labelRect.getRight(), bounds.getBottom()}, dashPattern, 2, 2.f);
+			g.drawDashedLine({labelRect.getRight(), bounds.getY(), labelRect.getRight(), bounds.getBottom()}, dashPattern, 2, 1.f);
 
 			labelRect.translate(labelRect.getWidth(), 0.f);
 		}
@@ -128,7 +122,7 @@ public:
 		{
 			const float yPos = bounds.getY() + ((mMagMax - yValLine) / (mMagMax - mMagMin)) * labelHeight;
             g.setColour(juce::Colours::white);
-			g.drawLine({mYAxisMargin * bounds.getWidth(), yPos, bounds.getWidth(), yPos}, 2.f);
+			g.drawLine({mYAxisMargin * bounds.getWidth(), yPos, bounds.getWidth(), yPos}, 1.f);
 			yValLine -= mYAxisLabelSpacing;
 		}
 
@@ -143,6 +137,15 @@ public:
             g.setColour(juce::Colours::white);
 			g.drawText(juce::String(label), labelRect, juce::Justification::centred);
 			yValLabel -= mYAxisLabelSpacing;
+		}
+
+		// meters
+		for (int octave = 0; octave < OctaveNumber; octave++) 
+		{
+			for (int tone = 0; tone < B; tone++) 
+			{
+                mMagnitudeMeters[octave][tone].paint(g);
+			}
 		}
     }
 
@@ -174,12 +177,35 @@ public:
 				double magLog = juce::Decibels::gainToDecibels(value);
 				magLog = Cqt::Clip<double>(magLog, mMagMin, mMagMax);
 				const double magLogMapped = 1. - ((mMagMax - magLog) / (mMagMax - mMagMin));
-				mMagnitudeMeters[octave][tone].setValue(magLogMapped);
+				mMagnitudeMeters[OctaveNumber - octave - 1][tone].setValue(magLogMapped);
 			}
 		}
 		repaint();
 	}
 
+	void setRangeMin(const double rangeMin)
+	{
+		if(static_cast<int>(rangeMin) != static_cast<int>(mMagMax))
+		{
+			mMagMin = rangeMin;
+			repaint();
+		}	
+	}
+
+	void setRangeMax(const double rangeMax)
+	{
+		if(static_cast<int>(rangeMax) != static_cast<int>(mMagMin))
+		{
+			mMagMax = rangeMax;
+			repaint();
+		}
+	}
+
+	void setTuning(const double tuning)
+	{
+		mTuning = tuning;
+		repaint();
+	}
 private:
 	AudioPluginAudioProcessor& processorRef;
 

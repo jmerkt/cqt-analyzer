@@ -49,6 +49,8 @@ public:
 
     //==============================================================================
     double mCqtDataStorage[OctaveNumber][BinsPerOctave];
+    void setTuning(const double tuning){ mCqt.setConcertPitch(tuning); };
+    void setChannel(const int channel){ mChannel = channel; };
 private:
     //==============================================================================
     std::vector<double> mCqtSampleBuffer;
@@ -59,8 +61,6 @@ private:
     std::vector<std::unique_ptr<TimerMt>> mCqtTimers;
 
     int mChannel{ 0 };
-    double mMagMin{ -50. };
-    double mMagMax{ 0. };
     double mTuning{ 440. };
 
     //==============================================================================

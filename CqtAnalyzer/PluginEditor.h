@@ -16,9 +16,27 @@ public:
     void resized() override;
 
 private:
-    // This reference is provided as a quick way for your editor to
-    // access the processor object that created it.
+    void channelButtonClicked(const int channel);
+    void rangeSliderChanged();
+    void tuningSliderChanged();
+
     AudioPluginAudioProcessor& processorRef;
+
+    juce::Label mChannelLabel;
+    juce::Label mRangeLabel;
+    juce::Label mTuningLabel;
+    
+    juce::Label mHeadingLabel;
+    juce::Label mVersionLabel;
+    juce::Label mWebsiteLabel;
+
+    juce::TextButton mLeftChannelButton{"L"};
+    juce::TextButton mRightChannelButton{"R"};
+    juce::TextButton mMidChannelButton{"M"};
+    juce::TextButton mSideChannelButton{"S"};
+
+    juce::Slider mRangeSlider;
+    juce::Slider mTuningSlider;
 
     MagnitudesComponent<BinsPerOctave, OctaveNumber> mMagnitudesComponent{ processorRef };
 

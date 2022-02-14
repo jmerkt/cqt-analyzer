@@ -173,10 +173,48 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         buffer.clear (i, 0, buffer.getNumSamples());
 
 
-    auto* channelData = buffer.getReadPointer (mChannel);
-    for(int s = 0; s < buffer.getNumSamples(); s++)
+    switch(mChannel)
     {
-        mCqtSampleBuffer[s] = static_cast<double>(channelData[s]);
+        case 0:
+        {
+            auto* channelDataL = buffer.getReadPointer (0);
+            for(int s = 0; s < buffer.getNumSamples(); s++)
+            {
+                mCqtSampleBuffer[s] = static_cast<double>(channelDataL[s]);
+            }
+            break;
+        }
+        case 1:
+        {
+            auto* channelDataR = buffer.getReadPointer (1);
+            for(int s = 0; s < buffer.getNumSamples(); s++)
+            {
+                mCqtSampleBuffer[s] = static_cast<double>(channelDataR[s]);
+            }
+            break;
+        }
+        case 2:
+        {
+            auto* channelDataL = buffer.getReadPointer (0);
+            auto* channelDataR = buffer.getReadPointer (1);
+            for(int s = 0; s < buffer.getNumSamples(); s++)
+            {
+                mCqtSampleBuffer[s] = static_cast<double>(channelDataL[s] + channelDataR[s]);
+            }
+            break;
+        }
+        case 3:
+        {
+            auto* channelDataL = buffer.getReadPointer (0);
+            auto* channelDataR = buffer.getReadPointer (1);
+            for(int s = 0; s < buffer.getNumSamples(); s++)
+            {
+                mCqtSampleBuffer[s] = static_cast<double>(channelDataL[s] - channelDataR[s]);
+            }
+            break;
+        }
+        default:
+        break;
     }
     mCqt.inputBlock(mCqtSampleBuffer.data(), buffer.getNumSamples());
 }
