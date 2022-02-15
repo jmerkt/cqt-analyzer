@@ -18,6 +18,16 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
         schedule.octave = i;
         mCqtTimers.push_back(std::make_unique<TimerMt>(std::bind(&AudioPluginAudioProcessor::threadedCqtCall, this, schedule)));
     }
+
+    // reset feature buffers
+    for (int o = 0; o < OctaveNumber; o++)
+    {
+        for (int tone = 0; tone < BinsPerOctave; tone++)
+        {
+            mCqtDataStorage[o][tone] = 0.;
+            mKernelFreqs[o][tone] = 0.;
+        }
+    }
 }
 
 AudioPluginAudioProcessor::~AudioPluginAudioProcessor()
@@ -110,6 +120,7 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
         for (int tone = 0; tone < BinsPerOctave; tone++)
         {
             mCqtDataStorage[o][tone] = 0.;
+            mKernelFreqs[o][tone] = 0.;
         }
     }
 
@@ -122,6 +133,15 @@ void AudioPluginAudioProcessor::prepareToPlay (double sampleRate, int samplesPer
         mCqtTimers[i]->start(true);
     }
 
+    const auto kernelFreqs = mCqt.getKernelFreqs();
+    for (int o = 0; o < OctaveNumber; o++)
+    {
+        for (int tone = 0; tone < BinsPerOctave; tone++)
+        {
+            mKernelFreqs[o][tone] = kernelFreqs[o][tone];
+        }
+    }
+    mNewKernelFreqs = true;
 }
 
 void AudioPluginAudioProcessor::releaseResources()
@@ -163,12 +183,65 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
     auto totalNumInputChannels  = getTotalNumInputChannels();
     auto totalNumOutputChannels = getTotalNumOutputChannels();
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
+    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
+        buffer.clear (i, 0, buffer.getNumSamples());
+
+
+    switch(mChannel)
+    {
+        case 0:
+        {
+            auto* channelDataL = buffer.getReadPointer (0);
+            for(int s = 0; s < buffer.getNumSamples(); s++)
+            {
+                mCqtSampleBuffer[s] = static_cast<double>(channelDataL[s]);
+            }
+            break;
+        }
+        case 1:
+        {
+            auto* channelDataR = buffer.getReadPointer (1);
+            for(int s = 0; s < buffer.getNumSamples(); s++)
+            {
+                mCqtSampleBuffer[s] = static_cast<double>(channelDataR[s]);
+            }
+            break;
+        }
+        case 2:
+        {
+            auto* channelDataL = buffer.getReadPointer (0);
+            auto* channelDataR = buffer.getReadPointer (1);
+            for(int s = 0; s < buffer.getNumSamples(); s++)
+            {
+                mCqtSampleBuffer[s] = static_cast<double>(channelDataL[s] + channelDataR[s]);
+            }
+            break;
+        }
+        case 3:
+        {
+            auto* channelDataL = buffer.getReadPointer (0);
+            auto* channelDataR = buffer.getReadPointer (1);
+            for(int s = 0; s < buffer.getNumSamples(); s++)
+            {
+                mCqtSampleBuffer[s] = static_cast<double>(channelDataL[s] - channelDataR[s]);
+            }
+            break;
+        }
+        default:
+        break;
+    }
+    mCqt.inputBlock(mCqtSampleBuffer.data(), buffer.getNumSamples());
+}
+
+void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<double>& buffer,
+                                              juce::MidiBuffer& midiMessages)
+{
+    juce::ignoreUnused (midiMessages);
+
+    juce::ScopedNoDenormals noDenormals;
+    auto totalNumInputChannels  = getTotalNumInputChannels();
+    auto totalNumOutputChannels = getTotalNumOutputChannels();
+    
     for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
         buffer.clear (i, 0, buffer.getNumSamples());
 
@@ -253,6 +326,22 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
     return new AudioPluginAudioProcessor();
 }
 
+//==============================================================================
+
+void AudioPluginAudioProcessor::setTuning(const double tuning)
+{ 
+    mCqt.setConcertPitch(tuning); 
+    const auto kernelFreqs = mCqt.getKernelFreqs();
+    for (int o = 0; o < OctaveNumber; o++)
+    {
+        for (int tone = 0; tone < BinsPerOctave; tone++)
+        {
+            mKernelFreqs[o][tone] = kernelFreqs[o][tone];
+        }
+    }
+    mNewKernelFreqs = true;
+};
+
 void AudioPluginAudioProcessor::threadedCqtCall(const Cqt::ScheduleElement schedule)
 {
     mCqt.cqt(schedule);
@@ -265,3 +354,5 @@ void AudioPluginAudioProcessor::threadedCqtCall(const Cqt::ScheduleElement sched
         mCqtDataStorage[schedule.octave][tone] = magnitude;
     }
 }
+
+

@@ -2,7 +2,7 @@
 
 
 
-class MagnitudeMeter : public juce::Component
+class MagnitudeMeter : public juce::Component, public juce::TooltipClient
 {
 public:
     MagnitudeMeter() = default;
@@ -11,7 +11,7 @@ public:
     {
         if (mValue > 1.e-3)
 		{
-			auto valueRect = getBounds();
+			auto valueRect = getBounds().toFloat();
 			valueRect = valueRect.withTrimmedTop(valueRect.getHeight() - mValue * valueRect.getHeight());
             g.setColour(mColour);
 			g.fillRect(valueRect);
@@ -24,16 +24,55 @@ public:
 	{
 		if(value > mValue)
 		{
-			mValue = 0.3 * value + 0.7 * mValue;
+			mValue = (1. - mSmoothingUp) * value + mSmoothingUp * mValue;
 		}
 		else
 		{
-			mValue = 0.15 * value + 0.85 * mValue;
+			mValue = (1. - mSmoothingDown) * value + mSmoothingDown * mValue;
 		}	
 	};
 
+	const double& getValue()
+	{
+		return mValue;
+	}
+
+	void setSmoothing(const double smoothingUp, const double smoothingDown)
+	{
+		const double smoothingUpClipped = Cqt::Clip<double>(smoothingUp, 0., 0.999999);
+		const double smoothingDownClipped = Cqt::Clip<double>(smoothingDown, 0., 0.999999);
+		mSmoothingUp = smoothingUpClipped;
+		mSmoothingDown = smoothingDownClipped;
+	}
+
+	juce::String getTooltip() override
+	{
+		return mFrequencyString;
+	}
+
+	void setFrequency(const double frequency)
+	{
+		mFrequency = frequency;
+		if (frequency < 1000.)
+		{
+			mFrequencyString = std::to_string(static_cast<int>(std::round(frequency))) + " Hz";
+		}
+		else
+		{
+			std::ostringstream streamObj;
+			streamObj << std::fixed;
+			streamObj << std::setprecision(2);
+			streamObj << frequency / 1000.;
+			mFrequencyString = streamObj.str() + " kHz";
+		}
+	}
+
 private:
     double mValue{ 0. };
+	double mSmoothingUp{ 0.7 };
+	double mSmoothingDown{ 0.85 };
+	double mFrequency{ 50. };
+	juce::String mFrequencyString{"50 Hz"};
     juce::Colour mColour;
 
     //==============================================================================
@@ -54,7 +93,7 @@ public:
 			for (int tone = 0; tone < B; tone++) 
 			{
                 addAndMakeVisible(mMagnitudeMeters[octave][tone]);
-                mMagnitudeMeters[octave][tone].setColour(juce::Colour{static_cast<float>(octave * B + tone) * colorFadeIncr, 0.9, 0.5, 1.f});
+                mMagnitudeMeters[octave][tone].setColour(juce::Colour{static_cast<float>(octave * B + tone) * colorFadeIncr, 0.98, 0.6, 1.f});
 			}
 		}
 
@@ -71,21 +110,24 @@ public:
     {
         g.fillAll (mBackgroundColor);
 
-        auto bounds = getBounds();
+        auto bounds = getBounds().toFloat();
 
-        g.setFont(12.f / 550.f * static_cast<float>(bounds.getHeight()));
+        g.setFont(14.f / static_cast<float>(PLUGIN_HEIGHT) * bounds.getHeight());
 
 		// x-axis labels
 		const float octaveNumFloat = static_cast<float>(OctaveNumber);
 		auto labelRect = bounds.withTrimmedTop((1.f - mXAxisMargin) * bounds.getHeight());
 		labelRect = labelRect.withTrimmedLeft(mYAxisMargin * labelRect.getWidth());
 		labelRect = labelRect.withTrimmedRight((octaveNumFloat - 1.f) / octaveNumFloat * labelRect.getWidth());
+
+		labelRect = labelRect.withTrimmedBottom(labelRect.getHeight() * 0.37f); // Todo: why is this necessary to make labels fit?
+
 		const float colorFadeIncr = 1.f / (static_cast<float>(OctaveNumber));
 		for (int o = 0; o < OctaveNumber; o++)
 		{
-			const double fRef = std::pow(2., ((100. - 49.) / 12.)) * mTuning;
             const int toneOffset = static_cast<int>(std::round(9.f / 12.f * static_cast<float>(B)));
-			const double freq = (fRef / std::pow(2., (OctaveNumber - o))) * std::pow(2., static_cast<double>(B + toneOffset) / static_cast<double>(B));
+			const double freq = processorRef.mKernelFreqs[OctaveNumber - o - 1][toneOffset];
+			
 			std::string freqStr = "A" + std::to_string(o + 1) + ": ";
 			if (freq < 1000.)
 			{
@@ -102,12 +144,12 @@ public:
             g.setColour(juce::Colours::white);
 			g.drawText(juce::String(freqStr), labelRect, juce::Justification::centred);
 
-            g.setColour(juce::Colour{static_cast<float>(o) * colorFadeIncr, 0.9, 0.5, 1.f});
-			g.drawRect(labelRect.withSizeKeepingCentre(labelRect.getWidth() * 0.925f, labelRect.getHeight() * 0.925f), 6.f);
+            g.setColour(juce::Colour{static_cast<float>(o) * colorFadeIncr, 0.98, 0.6, 1.f});
+			g.drawRect(labelRect.withSizeKeepingCentre(labelRect.getWidth() - 3.f, labelRect.getHeight() - 6.f), 6.f);
             g.setColour(juce::Colours::white);
             float dashPattern[2];
-            dashPattern[0] = 8.0;
-            dashPattern[1] = 8.0;
+            dashPattern[0] = 4.0;
+            dashPattern[1] = 4.0;
 			g.drawDashedLine({labelRect.getRight(), bounds.getY(), labelRect.getRight(), bounds.getBottom()}, dashPattern, 2, 1.f);
 
 			labelRect.translate(labelRect.getWidth(), 0.f);
@@ -151,7 +193,7 @@ public:
 
     void resized() override
     {
-		auto meterRect = getBounds();
+		auto meterRect = getBounds().toFloat();
 		meterRect = meterRect.withTrimmedLeft(mYAxisMargin * meterRect.getWidth());
 		const float barWidth = meterRect.getWidth() / static_cast<float>(OctaveNumber * B);
 		meterRect = meterRect.withTrimmedRight(meterRect.getWidth() - barWidth);
@@ -161,7 +203,7 @@ public:
 		{
 			for (int tone = 0; tone < B; tone++) 
 			{
-                mMagnitudeMeters[octave][tone].setBounds(meterRect);
+                mMagnitudeMeters[octave][tone].setBounds(meterRect.toNearestIntEdges());
 				meterRect.translate(meterRect.getWidth(), 0.f);
 			}
 		}
@@ -179,6 +221,17 @@ public:
 				const double magLogMapped = 1. - ((mMagMax - magLog) / (mMagMax - mMagMin));
 				mMagnitudeMeters[OctaveNumber - octave - 1][tone].setValue(magLogMapped);
 			}
+		}
+		if(processorRef.mNewKernelFreqs)
+		{
+			for (int octave = 0; octave < OctaveNumber; octave++) 
+			{
+				for (int tone = 0; tone < B; tone++) 
+				{
+					mMagnitudeMeters[OctaveNumber - octave - 1][tone].setFrequency(processorRef.mKernelFreqs[octave][tone]);
+				}
+			}
+			processorRef.mNewKernelFreqs = false;
 		}
 		repaint();
 	}
@@ -206,6 +259,31 @@ public:
 		mTuning = tuning;
 		repaint();
 	}
+
+	void setSmoothing(const double smoothing)
+	{
+		const double smoothingClipped = Cqt::Clip<double>(smoothing, 0., 0.999999);
+		const double smoothingUp = smoothingClipped;
+		const double smoothingDown = (1. - (1. - smoothingClipped) * 0.5);
+		for (int octave = 0; octave < OctaveNumber; octave++) 
+		{
+			for (int tone = 0; tone < B; tone++) 
+			{
+				mMagnitudeMeters[octave][tone].setSmoothing(smoothingUp, smoothingDown);
+			}
+		}
+	}
+
+	void setSmoothing(const double smoothingUp, const double smoothingDown)
+	{
+		for (int octave = 0; octave < OctaveNumber; octave++) 
+			{
+				for (int tone = 0; tone < B; tone++) 
+				{
+					mMagnitudeMeters[octave][tone].setSmoothing(smoothingUp, smoothingDown);
+				}
+			}
+	}
 private:
 	AudioPluginAudioProcessor& processorRef;
 
@@ -215,7 +293,7 @@ private:
 	double mMagMin{ -50. };
 	double mMagMax{ 0. };
 	double mTuning{ 440. };
-	const float mXAxisMargin{ 0.1f };
+	const float mXAxisMargin{ 0.12f };
 	const float mYAxisMargin{ 0.06f };
 	const float mYAxisLabelSpacing{ 5.f };
 

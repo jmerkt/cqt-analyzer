@@ -22,6 +22,7 @@ public:
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
 
     void processBlock (juce::AudioBuffer<float>&, juce::MidiBuffer&) override;
+    void processBlock (juce::AudioBuffer<double>&, juce::MidiBuffer&) override;
     using AudioProcessor::processBlock;
 
     //==============================================================================
@@ -49,7 +50,9 @@ public:
 
     //==============================================================================
     double mCqtDataStorage[OctaveNumber][BinsPerOctave];
-    void setTuning(const double tuning){ mCqt.setConcertPitch(tuning); };
+    double mKernelFreqs[OctaveNumber][BinsPerOctave];
+    bool mNewKernelFreqs{false};
+    void setTuning(const double tuning);
     void setChannel(const int channel){ mChannel = channel; };
 private:
     //==============================================================================
@@ -62,7 +65,6 @@ private:
 
     int mChannel{ 0 };
     double mTuning{ 440. };
-
     //==============================================================================
     //juce::AudioProcessorValueTreeState parameters;
     

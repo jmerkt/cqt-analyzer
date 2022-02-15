@@ -19,12 +19,14 @@ private:
     void channelButtonClicked(const int channel);
     void rangeSliderChanged();
     void tuningSliderChanged();
+    void smoothingSliderChanged();
 
     AudioPluginAudioProcessor& processorRef;
 
     juce::Label mChannelLabel;
     juce::Label mRangeLabel;
     juce::Label mTuningLabel;
+    juce::Label mSmoothingLabel;
     
     juce::Label mHeadingLabel;
     juce::Label mVersionLabel;
@@ -37,6 +39,9 @@ private:
 
     juce::Slider mRangeSlider;
     juce::Slider mTuningSlider;
+    juce::Slider mSmoothingSlider;
+
+    juce::TooltipWindow mFrequencyTooltip;
 
     MagnitudesComponent<BinsPerOctave, OctaveNumber> mMagnitudesComponent{ processorRef };
 
