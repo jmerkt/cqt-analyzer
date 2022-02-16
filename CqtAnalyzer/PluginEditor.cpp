@@ -112,7 +112,7 @@ void AudioPluginAudioProcessorEditor::paint (juce::Graphics& g)
 
 void AudioPluginAudioProcessorEditor::resized()
 {
-    const float controlYFrac = 0.04f;
+    const float controlYFrac = 0.06f;
     const float headingYFrac = 0.08f;
     const float magXFrac = 1.0f; 
     auto b = getBounds().toFloat();

@@ -11,7 +11,7 @@ public:
     {
         if (mValue > 1.e-3)
 		{
-			auto valueRect = getBounds().toFloat();
+			auto valueRect = getLocalBounds().toFloat();
 			valueRect = valueRect.withTrimmedTop(valueRect.getHeight() - mValue * valueRect.getHeight());
             g.setColour(mColour);
 			g.fillRect(valueRect);
@@ -110,7 +110,7 @@ public:
     {
         g.fillAll (mBackgroundColor);
 
-        auto bounds = getBounds().toFloat();
+        auto bounds = getLocalBounds().toFloat();
 
         g.setFont(14.f / static_cast<float>(PLUGIN_HEIGHT) * bounds.getHeight());
 
@@ -119,8 +119,7 @@ public:
 		auto labelRect = bounds.withTrimmedTop((1.f - mXAxisMargin) * bounds.getHeight());
 		labelRect = labelRect.withTrimmedLeft(mYAxisMargin * labelRect.getWidth());
 		labelRect = labelRect.withTrimmedRight((octaveNumFloat - 1.f) / octaveNumFloat * labelRect.getWidth());
-
-		labelRect = labelRect.withTrimmedBottom(labelRect.getHeight() * 0.37f); // Todo: why is this necessary to make labels fit?
+		labelRect = labelRect.withTrimmedTop(2.f / static_cast<float>(PLUGIN_HEIGHT) * bounds.getHeight());
 
 		const float colorFadeIncr = 1.f / (static_cast<float>(OctaveNumber));
 		for (int o = 0; o < OctaveNumber; o++)
@@ -145,7 +144,7 @@ public:
 			g.drawText(juce::String(freqStr), labelRect, juce::Justification::centred);
 
             g.setColour(juce::Colour{static_cast<float>(o) * colorFadeIncr, 0.98, 0.6, 1.f});
-			g.drawRect(labelRect.withSizeKeepingCentre(labelRect.getWidth() - 3.f, labelRect.getHeight() - 6.f), 6.f);
+			g.drawRect(labelRect.withSizeKeepingCentre(labelRect.getWidth() - 3.f, labelRect.getHeight()), 6.f);
             g.setColour(juce::Colours::white);
             float dashPattern[2];
             dashPattern[0] = 4.0;
@@ -193,7 +192,7 @@ public:
 
     void resized() override
     {
-		auto meterRect = getBounds().toFloat();
+		auto meterRect = getLocalBounds().toFloat();
 		meterRect = meterRect.withTrimmedLeft(mYAxisMargin * meterRect.getWidth());
 		const float barWidth = meterRect.getWidth() / static_cast<float>(OctaveNumber * B);
 		meterRect = meterRect.withTrimmedRight(meterRect.getWidth() - barWidth);
@@ -293,7 +292,7 @@ private:
 	double mMagMin{ -50. };
 	double mMagMax{ 0. };
 	double mTuning{ 440. };
-	const float mXAxisMargin{ 0.12f };
+	const float mXAxisMargin{ 0.08f };
 	const float mYAxisMargin{ 0.06f };
 	const float mYAxisLabelSpacing{ 5.f };
 
