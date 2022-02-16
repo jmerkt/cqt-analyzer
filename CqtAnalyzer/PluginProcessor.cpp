@@ -10,8 +10,16 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
                       #endif
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
-                       )
+                       ),
+        mParameters (*this, nullptr, juce::Identifier ("CqtAnalyzer"), {})
 {
+    addParameter(mChannelParameter = new juce::AudioParameterInt ("channel", "Channel", 0, 3, 0));
+    addParameter(mTuningParameter = new juce::AudioParameterFloat ("tuning", "Tuning", 415.f, 465.f, 440.f));
+    addParameter(mRangeMinParameter = new juce::AudioParameterFloat ("rangeMin", "RangeMin", -120.f, 40.f, -50.f));
+    addParameter(mRangeMaxParameter = new juce::AudioParameterFloat ("rangeMax", "RangeMax", -120.f, 40.f, 10.f));
+    addParameter(mSmoothingUpParameter  = new juce::AudioParameterFloat ("smoothingUp", "SmoothingUp", 0.f, 1.f, 0.7f));
+    addParameter(mSmoothingDownParameter = new juce::AudioParameterFloat ("smoothingDown", "SmoothingDown", 0.f, 1.f, 0.85f));
+
     for (int i = 0; i < OctaveNumber; i++)
     {
         Cqt::ScheduleElement schedule;
@@ -187,7 +195,7 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<float>& buffer,
         buffer.clear (i, 0, buffer.getNumSamples());
 
 
-    switch(mChannel)
+    switch(mChannelParameter->get())
     {
         case 0:
         {
@@ -246,7 +254,7 @@ void AudioPluginAudioProcessor::processBlock (juce::AudioBuffer<double>& buffer,
         buffer.clear (i, 0, buffer.getNumSamples());
 
 
-    switch(mChannel)
+    switch(mChannelParameter->get())
     {
         case 0:
         {
@@ -300,23 +308,24 @@ bool AudioPluginAudioProcessor::hasEditor() const
 
 juce::AudioProcessorEditor* AudioPluginAudioProcessor::createEditor()
 {
-    return new AudioPluginAudioProcessorEditor (*this);
+    return new AudioPluginAudioProcessorEditor (*this, mParameters);
 }
 
 //==============================================================================
 void AudioPluginAudioProcessor::getStateInformation (juce::MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
-    juce::ignoreUnused (destData);
+    auto state = mParameters.copyState();
+    std::unique_ptr<juce::XmlElement> xml (state.createXml());
+    copyXmlToBinary (*xml, destData);
 }
 
 void AudioPluginAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
-    juce::ignoreUnused (data, sizeInBytes);
+    std::unique_ptr<juce::XmlElement> xmlState (getXmlFromBinary (data, sizeInBytes));
+ 
+    if (xmlState.get() != nullptr)
+        if (xmlState->hasTagName (mParameters.state.getType()))
+            mParameters.replaceState (juce::ValueTree::fromXml (*xmlState));
 }
 
 //==============================================================================
@@ -330,6 +339,7 @@ juce::AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 
 void AudioPluginAudioProcessor::setTuning(const double tuning)
 { 
+    *mTuningParameter = tuning;
     mCqt.setConcertPitch(tuning); 
     const auto kernelFreqs = mCqt.getKernelFreqs();
     for (int o = 0; o < OctaveNumber; o++)
@@ -340,7 +350,24 @@ void AudioPluginAudioProcessor::setTuning(const double tuning)
         }
     }
     mNewKernelFreqs = true;
+}
+
+void AudioPluginAudioProcessor::setChannel(const int channel)
+{ 
+    *mChannelParameter = channel; 
 };
+
+void AudioPluginAudioProcessor::setSmoothing(const double smoothingUp, const double smoothingDown)
+{
+    *mSmoothingUpParameter = smoothingUp;
+    *mSmoothingDownParameter = smoothingDown;
+}
+
+void AudioPluginAudioProcessor::setRange(const double rangeMin, const double rangeMax)
+{
+    *mRangeMinParameter = rangeMin;
+    *mRangeMaxParameter = rangeMax;
+}
 
 void AudioPluginAudioProcessor::threadedCqtCall(const Cqt::ScheduleElement schedule)
 {

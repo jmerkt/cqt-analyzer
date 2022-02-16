@@ -9,13 +9,10 @@ public:
 
     void paint (juce::Graphics& g) override
     {
-        if (mValue > 1.e-3)
-		{
-			auto valueRect = getLocalBounds().toFloat();
-			valueRect = valueRect.withTrimmedTop(valueRect.getHeight() - mValue * valueRect.getHeight());
-            g.setColour(mColour);
-			g.fillRect(valueRect);
-		}
+		auto valueRect = getLocalBounds().toFloat();
+		valueRect = valueRect.withTrimmedTop(valueRect.getHeight() - mValue * valueRect.getHeight());
+		g.setColour(mColour);
+		g.fillRect(valueRect);
     };
 
     void setColour(const juce::Colour colour){mColour = colour;};
@@ -121,7 +118,7 @@ public:
 		labelRect = labelRect.withTrimmedRight((octaveNumFloat - 1.f) / octaveNumFloat * labelRect.getWidth());
 		labelRect = labelRect.withTrimmedTop(2.f / static_cast<float>(PLUGIN_HEIGHT) * bounds.getHeight());
 
-		const float colorFadeIncr = 1.f / (static_cast<float>(OctaveNumber));
+		const float colorFadeIncr = 1.f / (static_cast<float>(OctaveNumber * B));
 		for (int o = 0; o < OctaveNumber; o++)
 		{
             const int toneOffset = static_cast<int>(std::round(9.f / 12.f * static_cast<float>(B)));
@@ -143,7 +140,7 @@ public:
             g.setColour(juce::Colours::white);
 			g.drawText(juce::String(freqStr), labelRect, juce::Justification::centred);
 
-            g.setColour(juce::Colour{static_cast<float>(o) * colorFadeIncr, 0.98, 0.6, 1.f});
+            g.setColour(juce::Colour::fromHSV(static_cast<float>(o * B + toneOffset) * colorFadeIncr, 0.98, 0.6, 1.f));
 			g.drawRect(labelRect.withSizeKeepingCentre(labelRect.getWidth() - 3.f, labelRect.getHeight()), 6.f);
             g.setColour(juce::Colours::white);
             float dashPattern[2];

@@ -14,7 +14,7 @@ cmake_minimum_required(VERSION 3.15)
 # `project()` command. `project()` sets up some helpful variables that describe source/binary
 # directories, and the current project version. This is a standard CMake command.
 
-project(AUDIO_PLUGIN_EXAMPLE VERSION 0.2.0)
+project(CqtAnalyzer VERSION 0.2.0)
 
 # If you've installed JUCE somehow (via a package manager, or directly using the CMake install
 # target), you'll need to tell this project that it depends on the installed copy of JUCE. If you've
@@ -51,7 +51,7 @@ juce_add_plugin(CqtAnalyzer
     PLUGIN_MANUFACTURER_CODE chrD               # A four-character manufacturer id with at least one upper-case character
     PLUGIN_CODE ctAn                            # A unique four-character plugin id with exactly one upper-case character
                                                 # GarageBand 10.3 requires the first letter to be upper-case, and the remaining letters to be lower-case
-    FORMATS AU VST3 Standalone                  # The formats to build. Other valid formats are: AAX Unity VST AU AUv3
+    FORMATS AU VST3                  # The formats to build. Other valid formats are: AAX Unity VST AU AUv3
     PRODUCT_NAME "CqtAnalyzer")        # The name of the final executable, which can differ from the target name
 
 # `juce_generate_juce_header` will create a JuceHeader.h for a given target, which will be generated

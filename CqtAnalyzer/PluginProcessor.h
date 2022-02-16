@@ -53,7 +53,10 @@ public:
     double mKernelFreqs[OctaveNumber][BinsPerOctave];
     bool mNewKernelFreqs{false};
     void setTuning(const double tuning);
-    void setChannel(const int channel){ mChannel = channel; };
+    void setChannel(const int channel);
+    void setSmoothing(const double smoothingUp, const double smoothingDown);
+    void setRange(const double rangeMin, const double rangeMax);
+
 private:
     //==============================================================================
     std::vector<double> mCqtSampleBuffer;
@@ -63,11 +66,14 @@ private:
 
     std::vector<std::unique_ptr<TimerMt>> mCqtTimers;
 
-    int mChannel{ 0 };
-    double mTuning{ 440. };
-    //==============================================================================
-    //juce::AudioProcessorValueTreeState parameters;
-    
+    juce::AudioProcessorValueTreeState mParameters;
+    juce::AudioParameterInt* mChannelParameter{ nullptr };
+    juce::AudioParameterFloat* mTuningParameter{ nullptr };
+    juce::AudioParameterFloat* mRangeMinParameter{ nullptr };
+    juce::AudioParameterFloat* mRangeMaxParameter{ nullptr };
+    juce::AudioParameterFloat* mSmoothingUpParameter{ nullptr };
+    juce::AudioParameterFloat* mSmoothingDownParameter{ nullptr };
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessor)
 };

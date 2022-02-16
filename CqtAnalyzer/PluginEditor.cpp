@@ -6,8 +6,8 @@ constexpr float HeadingSize{30.f};
 constexpr float WebsiteSize{16.f};
 
 //==============================================================================
-AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAudioProcessor& p)
-    : AudioProcessorEditor (&p), processorRef (p)
+AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAudioProcessor& p, juce::AudioProcessorValueTreeState& vts)
+    : AudioProcessorEditor (&p), processorRef (p), mParameters (vts)
 {
     juce::ignoreUnused (processorRef);
 
@@ -19,9 +19,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     setResizable(true, true);
 
     // global LookAndFeel
-    getLookAndFeel().setColour(juce::Slider::thumbColourId, juce::Colours::white);
-    getLookAndFeel().setColour(juce::Slider::trackColourId, juce::Colours::blue);
-    //getLookAndFeel().setColour(juce::Slider::textBoxBackgroundColourId , juce::Colours::grey);
+    setLookAndFeel (&mOtherLookAndFeel);
 
     // labels
     addAndMakeVisible(mChannelLabel);
@@ -64,12 +62,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     mRightChannelButton.onClick = [this] {channelButtonClicked(1);};
     mMidChannelButton.onClick = [this] {channelButtonClicked(2);};
     mSideChannelButton.onClick = [this] {channelButtonClicked(3);};
-    const juce::Colour activeColour = juce::Colours::blue;
-    const juce::Colour inactiveColour = juce::Colours::black;
-    mLeftChannelButton.setColour (juce::TextButton::buttonColourId, activeColour);
-    mRightChannelButton.setColour (juce::TextButton::buttonColourId, inactiveColour);
-    mMidChannelButton.setColour (juce::TextButton::buttonColourId, inactiveColour);
-    mSideChannelButton.setColour (juce::TextButton::buttonColourId, inactiveColour);
+    channelButtonClicked(0);
 
     addAndMakeVisible(mRangeSlider);
     addAndMakeVisible(mTuningSlider);
@@ -78,12 +71,12 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     mRangeSlider.setSliderStyle(juce::Slider::SliderStyle::TwoValueHorizontal);
     mRangeSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
     mRangeSlider.setRange(-120., 40., 5.);
-    mRangeSlider.setMinValue(-50., juce::dontSendNotification);
-    mRangeSlider.setMaxValue(10., juce::dontSendNotification);
+    mRangeSlider.setMinValue(-50.f, juce::dontSendNotification);
+    mRangeSlider.setMaxValue(10.f, juce::dontSendNotification);
     mRangeSlider.onValueChange = [this]{rangeSliderChanged();};
 
     mTuningSlider.setRange(415., 465., 0.01);
-    mTuningSlider.setValue(440., juce::dontSendNotification);
+    mTuningSlider.setValue(440.f, juce::dontSendNotification);
     mTuningSlider.setTextValueSuffix (" Hz");
     mTuningSlider.onValueChange = [this]{tuningSliderChanged();};
 
@@ -91,15 +84,40 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     mSmoothingSlider.setSkewFactor(4.);
     mSmoothingSlider.setSliderStyle(juce::Slider::SliderStyle::TwoValueHorizontal);
     mSmoothingSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
-    mSmoothingSlider.setMinValue(0.7, juce::dontSendNotification);
-    mSmoothingSlider.setMaxValue(0.85, juce::dontSendNotification);
+    mSmoothingSlider.setMinValue(0.7f, juce::dontSendNotification);
+    mSmoothingSlider.setMaxValue(0.85f, juce::dontSendNotification);
     mSmoothingSlider.onValueChange = [this]{smoothingSliderChanged();};
 
     addAndMakeVisible(mFrequencyTooltip);
+
+    const auto channelParameter = mParameters.getParameter("channel");
+    const auto tuningParameter = mParameters.getParameter("tuning");
+    const auto rangeMinParameter = mParameters.getParameter("rangeMin");
+    const auto rangeMaxParameter = mParameters.getParameter("rangeMax");
+    const auto smoothingUpParameter = mParameters.getParameter("smoothingUp");
+    const auto smoothingDownParameter = mParameters.getParameter("smoothingDown");
+    if(channelParameter &&
+    tuningParameter &&
+    rangeMinParameter &&
+    rangeMaxParameter &&
+    smoothingUpParameter &&
+    smoothingDownParameter)
+    {
+        channelButtonClicked(std::round(channelParameter->getValue()));
+        mTuningSlider.setValue(tuningParameter->getValue(), juce::dontSendNotification);
+        tuningSliderChanged();
+        mRangeSlider.setMinValue(rangeMinParameter->getValue(), juce::dontSendNotification);
+        mRangeSlider.setMaxValue(rangeMaxParameter->getValue(), juce::dontSendNotification);
+        rangeSliderChanged();
+        mSmoothingSlider.setMinValue(smoothingUpParameter->getValue(), juce::dontSendNotification);
+        mSmoothingSlider.setMaxValue(smoothingDownParameter->getValue(), juce::dontSendNotification);
+        smoothingSliderChanged();
+    }
 }
 
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor()
 {
+    setLookAndFeel (nullptr);
 }
 
 //==============================================================================
@@ -115,7 +133,7 @@ void AudioPluginAudioProcessorEditor::resized()
     const float controlYFrac = 0.06f;
     const float headingYFrac = 0.08f;
     const float magXFrac = 1.0f; 
-    auto b = getBounds().toFloat();
+    auto b = getLocalBounds().toFloat();
 
     auto controlRect = b.withTrimmedBottom((1.f - controlYFrac) * b.getHeight());
     controlRect = controlRect.withTrimmedRight((1.f - magXFrac) * b.getWidth());
@@ -175,18 +193,19 @@ void AudioPluginAudioProcessorEditor::resized()
 
     mFrequencyTooltip.setBounds(b.toNearestIntEdges());
 
-    mChannelLabel.setFont (juce::Font (LabelSize / static_cast<float>(PLUGIN_HEIGHT) * b.getHeight(), juce::Font::bold));
-    mRangeLabel.setFont (juce::Font (LabelSize / static_cast<float>(PLUGIN_HEIGHT) * b.getHeight(), juce::Font::bold));
-    mTuningLabel.setFont (juce::Font (LabelSize / static_cast<float>(PLUGIN_HEIGHT) * b.getHeight(), juce::Font::bold));
-    mSmoothingLabel.setFont (juce::Font (LabelSize / static_cast<float>(PLUGIN_HEIGHT) * b.getHeight(), juce::Font::bold));
-    mHeadingLabel.setFont (juce::Font (HeadingSize / static_cast<float>(PLUGIN_HEIGHT) * b.getHeight(), juce::Font::bold));
-    mVersionLabel.setFont (juce::Font (WebsiteSize / static_cast<float>(PLUGIN_HEIGHT) * b.getHeight(), juce::Font::bold));
-    mWebsiteLabel.setFont (juce::Font (WebsiteSize / static_cast<float>(PLUGIN_HEIGHT) * b.getHeight(), juce::Font::bold));
+    const float labelScaling = 1.f / static_cast<float>(PLUGIN_HEIGHT) * b.getHeight();
+    mChannelLabel.setFont (juce::Font (LabelSize * labelScaling, juce::Font::bold));
+    mRangeLabel.setFont (juce::Font (LabelSize * labelScaling, juce::Font::bold));
+    mTuningLabel.setFont (juce::Font (LabelSize * labelScaling, juce::Font::bold));
+    mSmoothingLabel.setFont (juce::Font (LabelSize * labelScaling, juce::Font::bold));
+    mHeadingLabel.setFont (juce::Font (HeadingSize * labelScaling, juce::Font::bold));
+    mVersionLabel.setFont (juce::Font (WebsiteSize * labelScaling, juce::Font::bold));
+    mWebsiteLabel.setFont (juce::Font (WebsiteSize * labelScaling, juce::Font::bold));
 }
 
 void AudioPluginAudioProcessorEditor::channelButtonClicked(const int channel)
 {
-    const juce::Colour activeColour = juce::Colours::blue;
+    const juce::Colour activeColour = juce::Colour::fromHSV(0.52, 0.98, 0.6, 1.f);
     const juce::Colour inactiveColour = juce::Colours::black;
     switch(channel)
     {
@@ -223,8 +242,11 @@ void AudioPluginAudioProcessorEditor::channelButtonClicked(const int channel)
 
 void AudioPluginAudioProcessorEditor::rangeSliderChanged()
 {
-    mMagnitudesComponent.setRangeMin(mRangeSlider.getMinValue());
-    mMagnitudesComponent.setRangeMax(mRangeSlider.getMaxValue());
+    const auto rangeMin = mRangeSlider.getMinValue();
+    const auto rangeMax = mRangeSlider.getMaxValue();
+    mMagnitudesComponent.setRangeMin(rangeMin);
+    mMagnitudesComponent.setRangeMax(rangeMax);
+    processorRef.setRange(rangeMin, rangeMax);
 }
 
 
@@ -237,5 +259,8 @@ void AudioPluginAudioProcessorEditor::tuningSliderChanged()
 
 void AudioPluginAudioProcessorEditor::smoothingSliderChanged()
 {
-    mMagnitudesComponent.setSmoothing(mSmoothingSlider.getMinValue(), mSmoothingSlider.getMaxValue());
+    const auto smoothingUp = mSmoothingSlider.getMinValue();
+    const auto smoothingDown = mSmoothingSlider.getMaxValue();
+    mMagnitudesComponent.setSmoothing(smoothingUp, smoothingDown);
+    processorRef.setSmoothing(smoothingUp, smoothingDown);
 }

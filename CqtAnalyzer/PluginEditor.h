@@ -3,12 +3,13 @@
 #include "PluginProcessor.h"
 
 #include "../include/gui/MagnitudesComponent.h"
+#include "../include/gui/OtherLookAndFeel.h"
 
 //==============================================================================
 class AudioPluginAudioProcessorEditor  : public juce::AudioProcessorEditor
 {
 public:
-    explicit AudioPluginAudioProcessorEditor (AudioPluginAudioProcessor&);
+    explicit AudioPluginAudioProcessorEditor (AudioPluginAudioProcessor&, juce::AudioProcessorValueTreeState&);
     ~AudioPluginAudioProcessorEditor() override;
 
     //==============================================================================
@@ -22,6 +23,7 @@ private:
     void smoothingSliderChanged();
 
     AudioPluginAudioProcessor& processorRef;
+    juce::AudioProcessorValueTreeState& mParameters;
 
     juce::Label mChannelLabel;
     juce::Label mRangeLabel;
@@ -44,6 +46,8 @@ private:
     juce::TooltipWindow mFrequencyTooltip;
 
     MagnitudesComponent<BinsPerOctave, OctaveNumber> mMagnitudesComponent{ processorRef };
+
+    OtherLookAndFeel mOtherLookAndFeel;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AudioPluginAudioProcessorEditor)
 };
