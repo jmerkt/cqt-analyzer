@@ -6,7 +6,7 @@
 	url = https://github.com/steinbergmedia/vst3sdk.git
 [submodule "submodules/rt-cqt"]
 	path = submodules/rt-cqt
-	url = git@github.com:jmerkt/rt-cqt.git
+	url = https://github.com/jmerkt/rt-cqt.git
 [submodule "submodules/JUCE"]
 	path = submodules/JUCE
 	url = https://github.com/juce-framework/JUCE.git
