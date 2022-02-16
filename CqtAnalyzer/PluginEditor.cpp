@@ -18,6 +18,11 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     setSize (PLUGIN_WIDTH, PLUGIN_HEIGHT);
     setResizable(true, true);
 
+    // global LookAndFeel
+    getLookAndFeel().setColour(juce::Slider::thumbColourId, juce::Colours::white);
+    getLookAndFeel().setColour(juce::Slider::trackColourId, juce::Colours::blue);
+    //getLookAndFeel().setColour(juce::Slider::textBoxBackgroundColourId , juce::Colours::grey);
+
     // labels
     addAndMakeVisible(mChannelLabel);
     addAndMakeVisible(mRangeLabel);
@@ -34,14 +39,6 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     mHeadingLabel.setText("CqtAnalyzer", juce::dontSendNotification);
     mVersionLabel.setText("Version 0.2.0", juce::dontSendNotification);
     mWebsiteLabel.setText("www.ChromaDSP.com", juce::dontSendNotification);
-
-    // mChannelLabel.setFont (juce::Font (LabelSize / static_cast<float>(PLUGIN_HEIGHT) * bounds.getHeight(), juce::Font::bold));
-    // mRangeLabel.setFont (juce::Font (LabelSize / static_cast<float>(PLUGIN_HEIGHT) * bounds.getHeight(), juce::Font::bold));
-    // mTuningLabel.setFont (juce::Font (LabelSize / static_cast<float>(PLUGIN_HEIGHT) * bounds.getHeight(), juce::Font::bold));
-    // mSmoothingLabel.setFont (juce::Font (LabelSize / static_cast<float>(PLUGIN_HEIGHT) * bounds.getHeight(), juce::Font::bold));
-    // mHeadingLabel.setFont (juce::Font (HeadingSize / static_cast<float>(PLUGIN_HEIGHT) * bounds.getHeight(), juce::Font::bold));
-    // mVersionLabel.setFont (juce::Font (WebisteSize / static_cast<float>(PLUGIN_HEIGHT) * bounds.getHeight(), juce::Font::bold));
-    // mWebsiteLabel.setFont (juce::Font (WebisteSize / static_cast<float>(PLUGIN_HEIGHT) * bounds.getHeight(), juce::Font::bold));
 
     mChannelLabel.setColour (juce::Label::textColourId, juce::Colours::white);
     mRangeLabel.setColour (juce::Label::textColourId, juce::Colours::white);
@@ -67,7 +64,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     mRightChannelButton.onClick = [this] {channelButtonClicked(1);};
     mMidChannelButton.onClick = [this] {channelButtonClicked(2);};
     mSideChannelButton.onClick = [this] {channelButtonClicked(3);};
-    const juce::Colour activeColour = juce::Colours::green;
+    const juce::Colour activeColour = juce::Colours::blue;
     const juce::Colour inactiveColour = juce::Colours::black;
     mLeftChannelButton.setColour (juce::TextButton::buttonColourId, activeColour);
     mRightChannelButton.setColour (juce::TextButton::buttonColourId, inactiveColour);
@@ -189,7 +186,7 @@ void AudioPluginAudioProcessorEditor::resized()
 
 void AudioPluginAudioProcessorEditor::channelButtonClicked(const int channel)
 {
-    const juce::Colour activeColour = juce::Colours::green;
+    const juce::Colour activeColour = juce::Colours::blue;
     const juce::Colour inactiveColour = juce::Colours::black;
     switch(channel)
     {
