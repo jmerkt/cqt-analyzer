@@ -9,7 +9,7 @@ public:
 
     void paint (juce::Graphics& g) override
     {
-		auto valueRect = getLocalBounds().toFloat();
+		auto valueRect = getBounds().toFloat();
 		valueRect = valueRect.withTrimmedTop(valueRect.getHeight() - mValue * valueRect.getHeight());
 		g.setColour(mColour);
 		g.fillRect(valueRect);
@@ -28,6 +28,11 @@ public:
 			mValue = (1. - mSmoothingDown) * value + mSmoothingDown * mValue;
 		}	
 	};
+
+	void setValueHard(const double value)
+	{
+		mValue = value;
+	}
 
 	const double& getValue()
 	{
@@ -124,7 +129,7 @@ public:
             const int toneOffset = static_cast<int>(std::round(9.f / 12.f * static_cast<float>(B)));
 			const double freq = processorRef.mKernelFreqs[OctaveNumber - o - 1][toneOffset];
 			
-			std::string freqStr = "A" + std::to_string(o + 1) + ": ";
+			std::string freqStr = "A" + std::to_string(o) + ": ";
 			if (freq < 1000.)
 			{
 				freqStr += std::to_string(static_cast<int>(std::round(freq))) + " Hz";
@@ -214,7 +219,7 @@ public:
 				const double value = processorRef.mCqtDataStorage[octave][tone];
 				double magLog = juce::Decibels::gainToDecibels(value);
 				magLog = Cqt::Clip<double>(magLog, mMagMin, mMagMax);
-				const double magLogMapped = 1. - ((mMagMax - magLog) / (mMagMax - mMagMin));
+				const double magLogMapped = 1. - ((mMagMax - magLog) * mOneDivMaxMin);
 				mMagnitudeMeters[OctaveNumber - octave - 1][tone].setValue(magLogMapped);
 			}
 		}
@@ -232,11 +237,39 @@ public:
 		repaint();
 	}
 
+	void remapValues()
+	{
+		for (int octave = 0; octave < OctaveNumber; octave++) 
+		{
+			for (int tone = 0; tone < B; tone++) 
+			{
+				const double magLogMapped = mMagnitudeMeters[OctaveNumber - octave - 1][tone].getValue();
+				const double magLog = magLogMapped * (mMagMaxPrev - mMagMinPrev) + mMagMinPrev;
+				if((magLog > mMagMin) && (magLog < mMagMax) && (magLog > mMagMinPrev))
+				{
+					const double magLogRemapped = 1. - ((mMagMax - magLog) * mOneDivMaxMin);
+					mMagnitudeMeters[OctaveNumber - octave - 1][tone].setValueHard(magLogRemapped);
+				}
+				else if(magLog > mMagMax)
+				{
+					mMagnitudeMeters[OctaveNumber - octave - 1][tone].setValueHard(1.);
+				}
+				else
+				{
+					mMagnitudeMeters[OctaveNumber - octave - 1][tone].setValueHard(0.);
+				}	
+			}
+		}
+	}
+
 	void setRangeMin(const double rangeMin)
 	{
 		if(static_cast<int>(rangeMin) != static_cast<int>(mMagMax))
 		{
+			mMagMinPrev = mMagMin;
 			mMagMin = rangeMin;
+			mOneDivMaxMin = 1. / (mMagMax - mMagMin);
+			remapValues();
 			repaint();
 		}	
 	}
@@ -245,7 +278,10 @@ public:
 	{
 		if(static_cast<int>(rangeMax) != static_cast<int>(mMagMin))
 		{
+			mMagMaxPrev = mMagMax;
 			mMagMax = rangeMax;
+			mOneDivMaxMin = 1. / (mMagMax - mMagMin);
+			remapValues();
 			repaint();
 		}
 	}
@@ -288,7 +324,10 @@ private:
 	MagnitudeMeter mMagnitudeMeters[OctaveNumber][B];
 	double mMagMin{ -50. };
 	double mMagMax{ 0. };
+	double mMagMinPrev{ -50. };
+	double mMagMaxPrev{ 0. };
 	double mTuning{ 440. };
+	double mOneDivMaxMin{ 1. };
 	const float mXAxisMargin{ 0.08f };
 	const float mYAxisMargin{ 0.06f };
 	const float mYAxisLabelSpacing{ 5.f };

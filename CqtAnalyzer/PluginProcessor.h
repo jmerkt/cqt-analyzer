@@ -5,7 +5,7 @@
 #include "../submodules/rt-cqt/include/ConstantQTransform.h"
 
 constexpr int BinsPerOctave{ 48 };
-constexpr int OctaveNumber{ 9 };
+constexpr int OctaveNumber{ 10 };
 
 //==============================================================================
 class AudioPluginAudioProcessor  : public juce::AudioProcessor
@@ -56,7 +56,6 @@ public:
     void setChannel(const int channel);
     void setSmoothing(const double smoothingUp, const double smoothingDown);
     void setRange(const double rangeMin, const double rangeMax);
-
 private:
     //==============================================================================
     std::vector<double> mCqtSampleBuffer;

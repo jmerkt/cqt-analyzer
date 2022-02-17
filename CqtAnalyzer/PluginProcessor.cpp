@@ -11,14 +11,22 @@ AudioPluginAudioProcessor::AudioPluginAudioProcessor()
                        .withOutput ("Output", juce::AudioChannelSet::stereo(), true)
                      #endif
                        ),
-        mParameters (*this, nullptr, juce::Identifier ("CqtAnalyzer"), {})
+        mParameters (*this, nullptr, juce::Identifier ("CqtAnalyzer"), 
+        {
+            std::make_unique<juce::AudioParameterInt> ("channel", "Channel", 0, 3, 0),
+            std::make_unique<juce::AudioParameterFloat> ("tuning", "Tuning", 415.305f, 466.164f, 440.f),
+            std::make_unique<juce::AudioParameterFloat> ("rangeMin", "RangeMin", -100.f, 40.f, -50.f),
+            std::make_unique<juce::AudioParameterFloat> ("rangeMax", "RangeMax", -100.f, 40.f, 10.f),
+            std::make_unique<juce::AudioParameterFloat> ("smoothingUp", "SmoothingUp", 0.f, 1.f, 0.7f),
+            std::make_unique<juce::AudioParameterFloat> ("smoothingDown", "SmoothingDown", 0.f, 1.f, 0.9f)
+        })
 {
-    addParameter(mChannelParameter = new juce::AudioParameterInt ("channel", "Channel", 0, 3, 0));
-    addParameter(mTuningParameter = new juce::AudioParameterFloat ("tuning", "Tuning", 415.f, 465.f, 440.f));
-    addParameter(mRangeMinParameter = new juce::AudioParameterFloat ("rangeMin", "RangeMin", -120.f, 40.f, -50.f));
-    addParameter(mRangeMaxParameter = new juce::AudioParameterFloat ("rangeMax", "RangeMax", -120.f, 40.f, 10.f));
-    addParameter(mSmoothingUpParameter  = new juce::AudioParameterFloat ("smoothingUp", "SmoothingUp", 0.f, 1.f, 0.7f));
-    addParameter(mSmoothingDownParameter = new juce::AudioParameterFloat ("smoothingDown", "SmoothingDown", 0.f, 1.f, 0.85f));
+    mChannelParameter = dynamic_cast<juce::AudioParameterInt*>(mParameters.getParameter("channel"));
+    mTuningParameter = dynamic_cast<juce::AudioParameterFloat*>(mParameters.getParameter("tuning"));
+    mRangeMinParameter = dynamic_cast<juce::AudioParameterFloat*>(mParameters.getParameter("rangeMin"));
+    mRangeMaxParameter = dynamic_cast<juce::AudioParameterFloat*>(mParameters.getParameter("rangeMax"));
+    mSmoothingUpParameter = dynamic_cast<juce::AudioParameterFloat*>(mParameters.getParameter("smoothingUp"));
+    mSmoothingDownParameter = dynamic_cast<juce::AudioParameterFloat*>(mParameters.getParameter("smoothingDown"));
 
     for (int i = 0; i < OctaveNumber; i++)
     {

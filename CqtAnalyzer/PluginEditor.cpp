@@ -21,6 +21,14 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     // global LookAndFeel
     setLookAndFeel (&mOtherLookAndFeel);
 
+    // get parameters saved in processor
+    const int channelParameter = mParameters.getParameterAsValue("channel").getValue();
+    const float tuningParameter = mParameters.getParameterAsValue("tuning").getValue();
+    const float rangeMinParameter = mParameters.getParameterAsValue("rangeMin").getValue();
+    const float rangeMaxParameter = mParameters.getParameterAsValue("rangeMax").getValue();
+    const float smoothingUpParameter = mParameters.getParameterAsValue("smoothingUp").getValue();
+    const float smoothingDownParameter = mParameters.getParameterAsValue("smoothingDown").getValue();
+
     // labels
     addAndMakeVisible(mChannelLabel);
     addAndMakeVisible(mRangeLabel);
@@ -62,7 +70,7 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
     mRightChannelButton.onClick = [this] {channelButtonClicked(1);};
     mMidChannelButton.onClick = [this] {channelButtonClicked(2);};
     mSideChannelButton.onClick = [this] {channelButtonClicked(3);};
-    channelButtonClicked(0);
+    channelButtonClicked(channelParameter);
 
     addAndMakeVisible(mRangeSlider);
     addAndMakeVisible(mTuningSlider);
@@ -70,49 +78,30 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
 
     mRangeSlider.setSliderStyle(juce::Slider::SliderStyle::TwoValueHorizontal);
     mRangeSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
-    mRangeSlider.setRange(-120., 40., 5.);
-    mRangeSlider.setMinValue(-50.f, juce::dontSendNotification);
-    mRangeSlider.setMaxValue(10.f, juce::dontSendNotification);
+    mRangeSlider.setRange(-100., 40., 5.);
+    mRangeSlider.setMinValue(rangeMinParameter, juce::dontSendNotification);
+    mRangeSlider.setMaxValue(rangeMaxParameter, juce::dontSendNotification);
     mRangeSlider.onValueChange = [this]{rangeSliderChanged();};
+    rangeSliderChanged();
 
-    mTuningSlider.setRange(415., 465., 0.01);
-    mTuningSlider.setValue(440.f, juce::dontSendNotification);
+    mTuningSlider.setRange(415.305f, 466.164f, 0.01);
+    mTuningSlider.setValue(tuningParameter, juce::dontSendNotification);
     mTuningSlider.setTextValueSuffix (" Hz");
     mTuningSlider.onValueChange = [this]{tuningSliderChanged();};
+    tuningSliderChanged();
 
     mSmoothingSlider.setRange(0., 1., 0.001);
     mSmoothingSlider.setSkewFactor(4.);
     mSmoothingSlider.setSliderStyle(juce::Slider::SliderStyle::TwoValueHorizontal);
     mSmoothingSlider.setTextBoxStyle(juce::Slider::TextEntryBoxPosition::NoTextBox, true, 0, 0);
-    mSmoothingSlider.setMinValue(0.7f, juce::dontSendNotification);
-    mSmoothingSlider.setMaxValue(0.85f, juce::dontSendNotification);
+    mSmoothingSlider.setMaxValue(smoothingDownParameter, juce::dontSendNotification);
+    mSmoothingSlider.setMinValue(smoothingUpParameter, juce::dontSendNotification);
     mSmoothingSlider.onValueChange = [this]{smoothingSliderChanged();};
+    smoothingSliderChanged();
 
-    addAndMakeVisible(mFrequencyTooltip);
+    mFrequencyTooltip.setMillisecondsBeforeTipAppears(100);
 
-    const auto channelParameter = mParameters.getParameter("channel");
-    const auto tuningParameter = mParameters.getParameter("tuning");
-    const auto rangeMinParameter = mParameters.getParameter("rangeMin");
-    const auto rangeMaxParameter = mParameters.getParameter("rangeMax");
-    const auto smoothingUpParameter = mParameters.getParameter("smoothingUp");
-    const auto smoothingDownParameter = mParameters.getParameter("smoothingDown");
-    if(channelParameter &&
-    tuningParameter &&
-    rangeMinParameter &&
-    rangeMaxParameter &&
-    smoothingUpParameter &&
-    smoothingDownParameter)
-    {
-        channelButtonClicked(std::round(channelParameter->getValue()));
-        mTuningSlider.setValue(tuningParameter->getValue(), juce::dontSendNotification);
-        tuningSliderChanged();
-        mRangeSlider.setMinValue(rangeMinParameter->getValue(), juce::dontSendNotification);
-        mRangeSlider.setMaxValue(rangeMaxParameter->getValue(), juce::dontSendNotification);
-        rangeSliderChanged();
-        mSmoothingSlider.setMinValue(smoothingUpParameter->getValue(), juce::dontSendNotification);
-        mSmoothingSlider.setMaxValue(smoothingDownParameter->getValue(), juce::dontSendNotification);
-        smoothingSliderChanged();
-    }
+    addAndMakeVisible(mFrequencyTooltip); 
 }
 
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor()
@@ -205,7 +194,7 @@ void AudioPluginAudioProcessorEditor::resized()
 
 void AudioPluginAudioProcessorEditor::channelButtonClicked(const int channel)
 {
-    const juce::Colour activeColour = juce::Colour::fromHSV(0.52, 0.98, 0.6, 1.f);
+    const juce::Colour activeColour = juce::Colour::fromHSV(0.57, 0.98, 0.6, 1.f);
     const juce::Colour inactiveColour = juce::Colours::black;
     switch(channel)
     {
