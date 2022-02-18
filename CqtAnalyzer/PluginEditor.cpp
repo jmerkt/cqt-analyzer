@@ -101,7 +101,26 @@ AudioPluginAudioProcessorEditor::AudioPluginAudioProcessorEditor (AudioPluginAud
 
     mFrequencyTooltip.setMillisecondsBeforeTipAppears(100);
 
+    // tooltips
     addAndMakeVisible(mFrequencyTooltip); 
+
+    mChannelLabel.setTooltip("Input channel.");
+    mLeftChannelButton.setTooltip("Left");
+    mRightChannelButton.setTooltip("Right");
+    mMidChannelButton.setTooltip("Mid");
+    mSideChannelButton.setTooltip("Side");   
+
+    mRangeLabel.setTooltip("Range of magnitudes.");
+    mRangeSlider.setTooltip("Range of magnitudes.");
+
+    mTuningLabel.setTooltip("Concert pitch tuning.");
+    mTuningSlider.setTooltip("Concert pitch tuning.");
+
+    mSmoothingLabel.setTooltip("Smoothing of magnitudes (Attack and Release).");
+    mSmoothingSlider.setTooltip("Smoothing of magnitudes (Attack and Release).");
+    
+    
+    
 }
 
 AudioPluginAudioProcessorEditor::~AudioPluginAudioProcessorEditor()
@@ -194,7 +213,7 @@ void AudioPluginAudioProcessorEditor::resized()
 
 void AudioPluginAudioProcessorEditor::channelButtonClicked(const int channel)
 {
-    const juce::Colour activeColour = juce::Colour::fromHSV(0.57, 0.98, 0.6, 1.f);
+    const juce::Colour activeColour = juce::Colour::fromHSV(0.57, 0.98, 0.725, 1.f);
     const juce::Colour inactiveColour = juce::Colours::black;
     switch(channel)
     {

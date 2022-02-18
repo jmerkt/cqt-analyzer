@@ -6,7 +6,7 @@ public:
     OtherLookAndFeel()
     {
         setColour(juce::Slider::thumbColourId, juce::Colours::white);
-        setColour(juce::Slider::trackColourId, juce::Colour::fromHSV(0.57, 0.98, 0.6, 1.f));
+        setColour(juce::Slider::trackColourId, juce::Colour::fromHSV(0.57, 0.98, 0.725, 1.f));
     }
 
     void drawButtonBackground (juce::Graphics& g, juce::Button& button, const juce::Colour& backgroundColour,

@@ -95,7 +95,7 @@ public:
 			for (int tone = 0; tone < B; tone++) 
 			{
                 addAndMakeVisible(mMagnitudeMeters[octave][tone]);
-                mMagnitudeMeters[octave][tone].setColour(juce::Colour{static_cast<float>(octave * B + tone) * colorFadeIncr, 0.98, 0.6, 1.f});
+                mMagnitudeMeters[octave][tone].setColour(juce::Colour{static_cast<float>(octave * B + tone) * colorFadeIncr, 0.98, 0.725, 1.f});
 			}
 		}
 
@@ -145,7 +145,7 @@ public:
             g.setColour(juce::Colours::white);
 			g.drawText(juce::String(freqStr), labelRect, juce::Justification::centred);
 
-            g.setColour(juce::Colour::fromHSV(static_cast<float>(o * B + toneOffset) * colorFadeIncr, 0.98, 0.6, 1.f));
+            g.setColour(juce::Colour::fromHSV(static_cast<float>(o * B + toneOffset) * colorFadeIncr, 0.98, 0.725, 1.f));
 			g.drawRect(labelRect.withSizeKeepingCentre(labelRect.getWidth() - 3.f, labelRect.getHeight()), 6.f);
             g.setColour(juce::Colours::white);
             float dashPattern[2];
