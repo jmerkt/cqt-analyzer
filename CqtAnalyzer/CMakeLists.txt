@@ -42,6 +42,8 @@ juce_add_plugin(CqtAnalyzer
     # ICON_BIG ...                              # ICON_* arguments specify a path to an image file to use as an icon for the Standalone
     # ICON_SMALL ...
     COMPANY_NAME ChromaDSP                          # Specify the name of the plugin's author
+    COMPANY_WEBSITE www.ChromaDSP.com
+    COMPANY_MAIL contact@chromadsp.com
     IS_SYNTH FALSE                       # Is this a synth or an effect?
     NEEDS_MIDI_INPUT FALSE               # Does the plugin need midi input?
     NEEDS_MIDI_OUTPUT FALSE              # Does the plugin need midi output?

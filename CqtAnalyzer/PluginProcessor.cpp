@@ -88,6 +88,11 @@ double AudioPluginAudioProcessor::getTailLengthSeconds() const
     return 0.0;
 }
 
+bool AudioPluginAudioProcessor::supportsDoublePrecisionProcessing () const
+{
+    return true;
+}
+
 int AudioPluginAudioProcessor::getNumPrograms()
 {
     return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
