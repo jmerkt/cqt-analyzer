@@ -52,6 +52,8 @@ juce_add_plugin(CqtAnalyzer
     PLUGIN_CODE ctAn                            # A unique four-character plugin id with exactly one upper-case character
                                                 # GarageBand 10.3 requires the first letter to be upper-case, and the remaining letters to be lower-case
     FORMATS AU VST3                  # The formats to build. Other valid formats are: AAX Unity VST AU AUv3
+    VST3_CATEGORIES Analyzer
+    AU_MAIN_TYPE kAudioUnitType_Effect
     PRODUCT_NAME "CqtAnalyzer")        # The name of the final executable, which can differ from the target name
 
 # `juce_generate_juce_header` will create a JuceHeader.h for a given target, which will be generated
